@@ -1,17 +1,11 @@
 import * as express from 'express';
 import User from './user.interface';
 import Controller from '../../interfaces/controller.interface';
+import userModel from './user.model';
 
 export class UserController implements Controller {
   public path = '/api/user';
   public router: express.Router = express.Router();
-  private users: User[] = [
-    {
-      username: 'nireo',
-      email: 'test@test.fi',
-      password: '1234'
-    }
-  ];
 
   constructor() {
     this.initRoutes();
@@ -19,16 +13,35 @@ export class UserController implements Controller {
 
   public initRoutes() {
     this.router.get(this.path, this.getAllUsers);
-    this.router.post(this.path, this.createAPost);
+    this.router.post(this.path, this.createAUser);
+    this.router.post(`${this.path}/:id`, this.getUserById);
   }
 
-  getAllUsers = (request: express.Request, response: express.Response) => {
-    response.send(this.users);
+  getAllUsers = async (
+    request: express.Request,
+    response: express.Response
+  ): Promise<void> => {
+    await userModel.find().exec(users => {
+      response.json(users);
+    });
   };
 
-  createAPost = (request: express.Request, response: express.Response) => {
+  getUserById = async (
+    request: express.Request,
+    response: express.Response
+  ): Promise<void> => {
+    await userModel
+      .findById(request.params.id)
+      .exec(user => response.json(user));
+  };
+
+  createAUser = async (
+    request: express.Request,
+    response: express.Response
+  ): Promise<void> => {
     const user: User = request.body;
-    this.users.push(user);
-    response.send(user);
+    const createdUser = new userModel(user);
+    await createdUser.save();
+    response.json(createdUser);
   };
 }
