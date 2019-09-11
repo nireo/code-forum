@@ -1,16 +1,7 @@
-//import express from 'express';
-
-//const app: express.Application = express();
-
-//app.get('/', (req: express.Request, res: express.Response) => {
-//res.send('ts test');
-//});
-
-//export default app;
-
 import express from 'express';
 import * as bodyParser from 'body-parser';
 import { UserController } from './components/user/user.controller';
+import 'dotenv/config';
 
 class App {
   public app: express.Application;
