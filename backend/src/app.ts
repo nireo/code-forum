@@ -1,6 +1,7 @@
 import express from 'express';
 import * as bodyParser from 'body-parser';
 import { UserController } from './components/user/user.controller';
+import { errorMiddleware } from './utils/error.middleware';
 import 'dotenv/config';
 
 class App {
@@ -18,6 +19,7 @@ class App {
 
   private initMiddleware() {
     this.app.use(bodyParser.json());
+    this.app.use(errorMiddleware);
   }
 
   private initControllers() {

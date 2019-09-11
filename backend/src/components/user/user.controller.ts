@@ -1,11 +1,15 @@
-import * as express from 'express';
+import express, { Response, Router, Request } from 'express';
 import User from './user.interface';
 import Controller from '../../interfaces/controller.interface';
 import userModel from './user.model';
+import { request } from 'https';
+import { runInNewContext } from 'vm';
+import { HttpException } from '../../exceptions/HttpException';
 
 export class UserController implements Controller {
   public path = '/api/user';
-  public router: express.Router = express.Router();
+  public router: Router = express.Router();
+  private user = userModel;
 
   constructor() {
     this.initRoutes();
@@ -14,34 +18,56 @@ export class UserController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllUsers);
     this.router.post(this.path, this.createAUser);
-    this.router.post(`${this.path}/:id`, this.getUserById);
+    this.router.get(`${this.path}/:id`, this.getUserById);
+    this.router.patch(`${this.path}/:id`, this.updateUser);
+    this.router.delete(`${this.path}/:id`, this.deleteUser);
   }
 
-  getAllUsers = async (
-    request: express.Request,
-    response: express.Response
-  ): Promise<void> => {
-    await userModel.find().exec(users => {
+  private getAllUsers = (request: Request, response: Response): void => {
+    this.user.find().exec(users => {
       response.json(users);
     });
   };
 
-  getUserById = async (
-    request: express.Request,
-    response: express.Response
-  ): Promise<void> => {
-    await userModel
-      .findById(request.params.id)
-      .exec(user => response.json(user));
+  private getUserById = (request: Request, response: Response): void => {
+    this.user.findById(request.params.id).then(user => {
+      if (user) {
+        response.json(user);
+      } else {
+        response.status(404).send({ error: 'User not found' });
+      }
+    });
   };
 
-  createAUser = async (
-    request: express.Request,
-    response: express.Response
-  ): Promise<void> => {
+  private createAUser = (request: Request, response: Response): void => {
     const user: User = request.body;
-    const createdUser = new userModel(user);
-    await createdUser.save();
-    response.json(createdUser);
+    const createdUser = new this.user(user);
+    createdUser.save().then(saved => {
+      response.json(saved);
+    });
+  };
+
+  private updateUser = (request: Request, response: Response): void => {
+    const userData: User = request.body;
+    this.user
+      .findByIdAndUpdate(request.params.id, userData, { new: true })
+      .then(user => {
+        response.json(user);
+      });
+  };
+
+  private deleteUser = (
+    request: Request,
+    response: Response,
+    next: express.NextFunction
+  ): void => {
+    this.user.findByIdAndDelete(request.params.id).then(success => {
+      if (success) {
+        response.status(204);
+      } else {
+        // post not found
+        next(new HttpException(404, 'User not found'));
+      }
+    });
   };
 }
