@@ -7,6 +7,10 @@ import CreateUserDto from '../user/user.dto';
 import LogInDto from './login.dto';
 import { HttpException } from '../../exceptions/HttpException';
 import { NotFoundException } from '../../exceptions/NotFoundException';
+import User from '../user/user.interface';
+import TokenData from '../../interfaces/token.data.interface';
+import DataStoredInToken from '../../interfaces/data.in.token.interface';
+import jwt from 'jsonwebtoken';
 
 export class AuthenticationController implements Controller {
   public path: string = '/api/auth';
@@ -44,6 +48,8 @@ export class AuthenticationController implements Controller {
         ...userData,
         password: hashedPassword
       });
+      const tokenData = this.createToken(user);
+      response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
       response.send(user);
     }
   };
@@ -61,6 +67,8 @@ export class AuthenticationController implements Controller {
         user.password
       );
       if (isPasswordMatching) {
+        const tokenData = this.createToken(user);
+        response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
         response.send(user);
       } else {
         next(new HttpException(403, 'Forbidden'));
@@ -69,4 +77,20 @@ export class AuthenticationController implements Controller {
       next(new NotFoundException('Not found'));
     }
   };
+
+  private createCookie(tokenData: TokenData) {
+    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
+  }
+
+  private createToken(user: User): TokenData {
+    const dataStoredInToken: DataStoredInToken = {
+      _id: user._id
+    };
+    const expiresIn = 60 * 60;
+    const secret = 'thisIsTemporarySinceEnvIsStupid';
+    return {
+      expiresIn,
+      token: jwt.sign(dataStoredInToken, secret, { expiresIn })
+    };
+  }
 }
