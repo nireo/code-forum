@@ -2,12 +2,10 @@ import express, { Response, Router, Request } from 'express';
 import User from './user.interface';
 import Controller from '../../interfaces/controller.interface';
 import userModel from './user.model';
-import { request } from 'https';
-import { runInNewContext } from 'vm';
 import { HttpException } from '../../exceptions/HttpException';
 
 export class UserController implements Controller {
-  public path = '/api/user';
+  public path: string = '/api/user';
   public router: Router = express.Router();
   private user = userModel;
 

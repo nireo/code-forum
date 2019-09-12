@@ -1,20 +1,19 @@
 import express from 'express';
 import * as bodyParser from 'body-parser';
-import { UserController } from './components/user/user.controller';
 import { errorMiddleware } from './utils/error.middleware';
+import Controller from './interfaces/controller.interface';
 import 'dotenv/config';
 
 class App {
   public app: express.Application;
   public port: number;
-  private UserControllerObject = new UserController();
 
-  constructor(port: number) {
+  constructor(controllers: Controller[], port: number) {
     this.app = express();
     this.port = port;
 
     this.initMiddleware();
-    this.initControllers();
+    this.initControllers(controllers);
   }
 
   private initMiddleware() {
@@ -22,8 +21,10 @@ class App {
     this.app.use(errorMiddleware);
   }
 
-  private initControllers() {
-    this.app.use('/', this.UserControllerObject.router);
+  private initControllers(controllers: Controller[]) {
+    controllers.forEach(controller => {
+      this.app.use('/', controller.router);
+    });
   }
 
   public listen() {
