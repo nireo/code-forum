@@ -10,6 +10,13 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
   //  comments: { type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }
 });
 
+userSchema.set('toJSON', {
+  transform: (document, object) => {
+    delete object.__v;
+    delete object.password;
+  }
+});
+
 const user = mongoose.model<User & mongoose.Document>('User', userSchema);
 
 export default user;

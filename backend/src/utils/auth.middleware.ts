@@ -9,7 +9,7 @@ const authMiddleware = async (
   request: RequestWithUser,
   response: Response,
   next: NextFunction
-) => {
+): Promise<void> => {
   const cookies = request.cookies;
   if (cookies && cookies.Authorization) {
     const secret: string = process.env.JWT;

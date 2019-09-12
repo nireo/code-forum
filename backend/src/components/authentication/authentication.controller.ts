@@ -88,7 +88,7 @@ export class AuthenticationController implements Controller {
       _id: user._id
     };
     const expiresIn = 60 * 60;
-    const secret = 'thisIsTemporarySinceEnvIsStupid';
+    const secret: string = process.env.JWT;
     return {
       expiresIn,
       token: jwt.sign(dataStoredInToken, secret, { expiresIn })
