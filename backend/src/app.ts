@@ -2,6 +2,7 @@ import express from 'express';
 import * as bodyParser from 'body-parser';
 import { errorMiddleware } from './utils/error.middleware';
 import Controller from './interfaces/controller.interface';
+import cookieParser from 'cookie-parser';
 import 'dotenv/config';
 
 class App {
@@ -19,6 +20,7 @@ class App {
   private initMiddleware() {
     this.app.use(bodyParser.json());
     this.app.use(errorMiddleware);
+    this.app.use(cookieParser());
   }
 
   private initControllers(controllers: Controller[]) {

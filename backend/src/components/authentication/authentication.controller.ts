@@ -32,6 +32,7 @@ export class AuthenticationController implements Controller {
       validationMiddleware(LogInDto),
       this.logIn
     );
+    this.router.post(`${this.path}/logout`, this.logOut);
   }
 
   private registration = async (
@@ -93,4 +94,11 @@ export class AuthenticationController implements Controller {
       token: jwt.sign(dataStoredInToken, secret, { expiresIn })
     };
   }
+
+  private logOut = (request: Request, response: Response) => {
+    // clear the header
+    response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
+    // if success send 200 status code
+    response.send(200);
+  };
 }

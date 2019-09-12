@@ -2,6 +2,7 @@ import { cleanEnv, str } from 'envalid';
 
 export default function validateEnv() {
   cleanEnv(process.env, {
-    MONGO_URI: str()
+    MONGO_URI: str(),
+    JWT: str()
   });
 }
