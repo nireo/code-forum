@@ -2,8 +2,8 @@ import App from './app';
 import validateEnv from './utils/validateEnv';
 import { connectToDatabase } from './utils/helper';
 import { UserController } from './components/user/user.controller';
-import { LoginController } from './components/login/login.controller';
 import { PostController } from './components/post/post.controller';
+import { AuthenticationController } from './components/authentication/authentication.controller';
 
 const { MONGO_URI } = process.env;
 
@@ -17,7 +17,7 @@ connectToDatabase(`${MONGO_URI}`);
 
 // init controllers and port
 const app = new App(
-  [new UserController(), new LoginController(), new PostController()],
+  [new UserController(), new PostController(), new AuthenticationController()],
   3001
 );
 

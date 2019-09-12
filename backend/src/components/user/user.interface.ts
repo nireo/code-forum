@@ -1,5 +1,3 @@
-import Post from '../post/post.interface';
-
 interface User {
   username: string;
   email: string;

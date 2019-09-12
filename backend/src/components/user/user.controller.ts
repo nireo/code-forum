@@ -15,7 +15,6 @@ export class UserController implements Controller {
 
   public initRoutes() {
     this.router.get(this.path, this.getAllUsers);
-    this.router.post(this.path, this.createAUser);
     this.router.get(`${this.path}/:id`, this.getUserById);
     this.router.patch(`${this.path}/:id`, this.updateUser);
     this.router.delete(`${this.path}/:id`, this.deleteUser);
@@ -34,14 +33,6 @@ export class UserController implements Controller {
       } else {
         response.status(404).send({ error: 'User not found' });
       }
-    });
-  };
-
-  private createAUser = (request: Request, response: Response): void => {
-    const user: User = request.body;
-    const createdUser = new this.user(user);
-    createdUser.save().then(saved => {
-      response.json(saved);
     });
   };
 
