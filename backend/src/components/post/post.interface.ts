@@ -4,6 +4,7 @@ interface Post {
   likes: number;
   dislikes: number;
   byUser: string;
+  comments: Comment[];
 }
 
 export default Post;
