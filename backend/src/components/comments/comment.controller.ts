@@ -24,12 +24,12 @@ export class CommentController implements Controller {
     // comments won't get a 'get all method' since there isn't any point
     // in initializing all the comments on the whole website
     this.router.get(`${this.path}/:id`, this.getCommentsInPost);
-    this.router.post(
-      `${this.path}/:id`,
-      authMiddleware,
-      validationMiddleware(CreateCommentDto),
-      this.createComment
-    );
+    //this.router.post(
+    //  `${this.path}/:id`,
+    //  authMiddleware,
+    //  validationMiddleware(CreateCommentDto),
+    //  this.createComment
+    //);
   }
 
   private getCommentsInPost = async (

@@ -12,7 +12,7 @@ const authMiddleware = async (
 ): Promise<void> => {
   const cookies = request.cookies;
   if (cookies && cookies.Authorization) {
-    const secret: string = process.env.JWT;
+    const secret: string = 'EnvSecret';
     try {
       const verifyResponse = jwt.verify(
         cookies.Authorization,

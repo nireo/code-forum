@@ -7,6 +7,7 @@ import RequestWithUser from '../../interfaces/requestWithUser';
 import CreatePostDto from './post.dto';
 import authMiddleware from '../../utils/auth.middleware';
 import validationMiddleware from '../../utils/validation.middleware';
+import { NotFoundException } from '../../exceptions/NotFoundException';
 
 export class PostController implements Controller {
   public path: string = '/api/post';
@@ -25,6 +26,7 @@ export class PostController implements Controller {
       validationMiddleware(CreatePostDto),
       this.createPost
     );
+    this.router.delete(`${this.path}/:id`, this.removePost);
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -57,5 +59,19 @@ export class PostController implements Controller {
     const saved = await newPost.save();
     await saved.populate('byUser').execPopulate();
     response.json(saved);
+  };
+
+  private removePost = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const id = request.params.id;
+    const success = await this.post.findByIdAndRemove(id);
+    if (success) {
+      response.send(204).end();
+    } else {
+      next(new NotFoundException('Post was not found'));
+    }
   };
 }
