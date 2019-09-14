@@ -27,6 +27,7 @@ export class PostController implements Controller {
       this.createPost
     );
     this.router.delete(`${this.path}/:id`, this.removePost);
+    this.router.delete(`${this.path}`, authMiddleware, this.removePost);
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -49,16 +50,21 @@ export class PostController implements Controller {
 
   private createPost = async (
     request: RequestWithUser,
-    response: Response
-  ): Promise<void> => {
+    response: Response,
+    next: NextFunction
+  ) => {
     const data: CreatePostDto = request.body;
-    const newPost = new this.post({
-      ...data,
-      byUser: request.user._id
-    });
-    const saved = await newPost.save();
-    await saved.populate('byUser').execPopulate();
-    response.json(saved);
+    if (request.user) {
+      const newPost = new this.post({
+        ...data,
+        byUser: request.user._id
+      });
+      const saved = await newPost.save();
+      await saved.populate('byUser').execPopulate();
+      response.json(saved);
+    } else {
+      next(new HttpException(403, 'Forbidden'));
+    }
   };
 
   private removePost = async (

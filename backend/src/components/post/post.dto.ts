@@ -2,13 +2,13 @@ import { IsString } from 'class-validator';
 
 class CreatePostDto {
   @IsString()
-  public title: string;
+  public title!: string;
 
   @IsString()
-  public content: string;
+  public content!: string;
 
   @IsString()
-  public byUser: string;
+  public byUser!: string;
 }
 
 export default CreatePostDto;

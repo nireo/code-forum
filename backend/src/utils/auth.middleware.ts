@@ -1,32 +1,33 @@
 import { NextFunction, Response } from 'express';
 import * as jwt from 'jsonwebtoken';
-import RequestWithUser from '../interfaces/requestWithUser';
-import { HttpException } from '../exceptions/HttpException';
 import DataStoredInToken from '../interfaces/data.in.token.interface';
+import RequestWithUser from '../interfaces/requestWithUser';
 import userModel from '../components/user/user.model';
+import { HttpException } from '../exceptions/HttpException';
 
 const authMiddleware = async (
   request: RequestWithUser,
   response: Response,
   next: NextFunction
-): Promise<void> => {
+) => {
   const cookies = request.cookies;
   if (cookies && cookies.Authorization) {
-    const secret: string = 'EnvSecret';
+    const secret = 'EnvSecret';
     try {
-      const verifyResponse = jwt.verify(
+      const verificationResponse = jwt.verify(
         cookies.Authorization,
         secret
       ) as DataStoredInToken;
-      const user = await userModel.findById(verifyResponse._id);
+      const id = verificationResponse._id;
+      const user = await userModel.findById(id);
       if (user) {
         request.user = user;
         next();
       } else {
-        next(new HttpException(401, 'Invalid token'));
+        next(new HttpException(403, 'Forbidden'));
       }
     } catch (error) {
-      next(new HttpException(401, 'Invalid token'));
+      next(new HttpException(403, 'Forbidden'));
     }
   } else {
     next(new HttpException(403, 'Forbidden'));

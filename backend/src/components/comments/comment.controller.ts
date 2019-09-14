@@ -24,12 +24,12 @@ export class CommentController implements Controller {
     // comments won't get a 'get all method' since there isn't any point
     // in initializing all the comments on the whole website
     this.router.get(`${this.path}/:id`, this.getCommentsInPost);
-    //this.router.post(
-    //  `${this.path}/:id`,
-    //  authMiddleware,
-    //  validationMiddleware(CreateCommentDto),
-    //  this.createComment
-    //);
+    this.router.post(
+      `${this.path}/:id`,
+      authMiddleware,
+      validationMiddleware(CreateCommentDto),
+      this.createComment
+    );
   }
 
   private getCommentsInPost = async (
@@ -55,15 +55,19 @@ export class CommentController implements Controller {
     const post = await this.post.findById(request.params.id);
     if (post) {
       const data: CreateCommentDto = request.body;
-      const newPost = new this.comment({
-        ...data,
-        byUser: request.user._id,
-        toPost: post._id
-      });
-      const savedComment = await newPost.save();
-      post.comments = post.comments.concat(savedComment._id);
-      const saved = await post.save();
-      response.json(saved);
+      if (request.user) {
+        const newPost = new this.comment({
+          ...data,
+          byUser: request.user._id,
+          toPost: post._id
+        });
+        const savedComment = await newPost.save();
+        post.comments = post.comments.concat(savedComment._id);
+        const saved = await post.save();
+        response.json(saved);
+      } else {
+        next(new HttpException(403, 'Forbidden'));
+      }
     } else {
       next(new NotFoundException('Post not found'));
     }
