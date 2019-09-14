@@ -9,6 +9,7 @@ import postModel from '../post/post.model';
 import authMiddleware from '../../utils/auth.middleware';
 import validationMiddleware from '../../utils/validation.middleware';
 import { NotFoundException } from '../../exceptions/NotFoundException';
+import e from 'express';
 
 export class CommentController implements Controller {
   public path: string = '/api/comment';
@@ -24,12 +25,14 @@ export class CommentController implements Controller {
     // comments won't get a 'get all method' since there isn't any point
     // in initializing all the comments on the whole website
     this.router.get(`${this.path}/:id`, this.getCommentsInPost);
-    this.router.post(
-      `${this.path}/:id`,
-      authMiddleware,
-      validationMiddleware(CreateCommentDto),
-      this.createComment
-    );
+    this.router
+      .all('/*', authMiddleware)
+      .post(
+        `${this.path}/:id`,
+        validationMiddleware(CreateCommentDto),
+        this.createComment
+      )
+      .delete(`${this.path}/:id`, this.deleteComment);
   }
 
   private getCommentsInPost = async (
@@ -70,6 +73,28 @@ export class CommentController implements Controller {
       }
     } else {
       next(new NotFoundException('Post not found'));
+    }
+  };
+
+  private deleteComment = async (
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ) => {
+    if (request.user) {
+      const comment = await this.comment.findById(request.params.id);
+      if (comment) {
+        if (comment.byUser === request.user._id) {
+          await this.comment.findByIdAndRemove(request.params.id);
+          response.status(204).end();
+        } else {
+          next(new HttpException(403, 'Forbidden'));
+        }
+      } else {
+        next(new NotFoundException('Post was not found'));
+      }
+    } else {
+      next(new HttpException(403, 'Forbidden'));
     }
   };
 }
