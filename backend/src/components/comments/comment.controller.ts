@@ -111,10 +111,11 @@ export class CommentController implements Controller {
       const newData: UpdateCommentDto = request.body;
       const newPost = this.comment.findByIdAndUpdate(
         request.params.id,
-        newData
+        newData,
+        { new: true }
       );
       if (newPost) {
-        response.status(204).end();
+        response.json(newPost);
       } else {
         next(new NotFoundException('Comment has not been found'));
       }

@@ -4,7 +4,7 @@ import postModel from './post.model';
 import { NextFunction } from 'connect';
 import { HttpException } from '../../exceptions/HttpException';
 import RequestWithUser from '../../interfaces/requestWithUser';
-import CreatePostDto from './post.dto';
+import CreatePostDto, { UpdatePostDto } from './post.dto';
 import authMiddleware from '../../utils/auth.middleware';
 import validationMiddleware from '../../utils/validation.middleware';
 import { NotFoundException } from '../../exceptions/NotFoundException';
@@ -20,14 +20,15 @@ export class PostController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.post(
-      this.path,
-      authMiddleware,
-      validationMiddleware(CreatePostDto),
-      this.createPost
-    );
-    this.router.delete(`${this.path}/:id`, this.removePost);
-    this.router.delete(`${this.path}`, authMiddleware, this.removePost);
+    this.router
+      .all('/*', authMiddleware)
+      .post(this.path, validationMiddleware(CreatePostDto), this.createPost)
+      .patch(
+        `${this.path}/:id`,
+        validationMiddleware(UpdatePostDto),
+        this.updatePost
+      )
+      .delete(`${this.path}/:id`, this.removePost);
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -78,6 +79,28 @@ export class PostController implements Controller {
       response.send(204).end();
     } else {
       next(new NotFoundException('Post was not found'));
+    }
+  };
+
+  private updatePost = async (
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    if (request.user) {
+      const newData: UpdatePostDto = request.body;
+      const newPost = this.post.findByIdAndUpdate(request.params.id, newData, {
+        new: true
+      });
+      if (newPost) {
+        response.json(newPost);
+      } else {
+        // this is since most of the time 'findByIdAndUpdate' only returns
+        // one type of error when the post has not been found.
+        next(new NotFoundException('Post has not been found'));
+      }
+    } else {
+      next(new HttpException(401, 'Invalid token'));
     }
   };
 }

@@ -1,4 +1,4 @@
-import { IsString } from 'class-validator';
+import { IsString, IsNumber } from 'class-validator';
 
 class CreatePostDto {
   @IsString()
@@ -9,6 +9,20 @@ class CreatePostDto {
 
   @IsString()
   public byUser!: string;
+}
+
+export class UpdatePostDto {
+  @IsString()
+  title!: string;
+
+  @IsString()
+  content!: string;
+
+  @IsNumber()
+  likes!: number;
+
+  @IsNumber()
+  dislikes!: number;
 }
 
 export default CreatePostDto;
