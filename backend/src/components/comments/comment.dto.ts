@@ -2,7 +2,7 @@ import { IsString, IsNumber } from 'class-validator';
 
 class CreateCommentDto {
   @IsString()
-  public content: string | undefined;
+  public content!: string;
 }
 
 export class UpdateCommentDto {
