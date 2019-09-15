@@ -4,6 +4,8 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
 import Link from '@material-ui/core/Link';
+import AppBar from '@material-ui/core/AppBar';
+import ToolBar from '@material-ui/core/Toolbar';
 
 const CopyRight: React.FC = () => {
   return (
@@ -32,6 +34,18 @@ const useStyles = makeStyles(theme => ({
     padding: theme.spacing(2),
     marginTop: 'auto',
     backgroundColor: 'white'
+  },
+  appBar: {
+    borderBottom: `1px solid ${theme.palette.divider}`
+  },
+  toolbar: {
+    flexWrap: 'wrap'
+  },
+  toolbarTitle: {
+    flexGrow: 1
+  },
+  link: {
+    margin: theme.spacing(1, 1.5)
   }
 }));
 
@@ -40,6 +54,33 @@ const Main: React.FC = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
+      <AppBar
+        position="static"
+        color="default"
+        elevation={0}
+        className={classes.appBar}
+      >
+        <ToolBar className={classes.toolbar}>
+          <Typography
+            variant="h6"
+            color="inherit"
+            noWrap
+            className={classes.toolbarTitle}
+          >
+            code forum
+          </Typography>
+          <nav>
+            <Link
+              variant="button"
+              color="textPrimary"
+              href="#"
+              className={classes.link}
+            >
+              Posts
+            </Link>
+          </nav>
+        </ToolBar>
+      </AppBar>
       <Container component="main" className={classes.main} maxWidth="lg">
         <Typography variant="h2">Welcome to code forum</Typography>
       </Container>
