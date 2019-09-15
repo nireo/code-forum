@@ -39,7 +39,7 @@ export class PostController implements Controller {
     request: Request,
     response: Response,
     next: NextFunction
-  ) => {
+  ): Promise<void> => {
     const post = this.post.findById(request.params.id);
     if (post) {
       response.json(post);
@@ -52,7 +52,7 @@ export class PostController implements Controller {
     request: RequestWithUser,
     response: Response,
     next: NextFunction
-  ) => {
+  ): Promise<void> => {
     const data: CreatePostDto = request.body;
     if (request.user) {
       const newPost = new this.post({

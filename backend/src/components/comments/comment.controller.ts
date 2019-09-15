@@ -3,13 +3,12 @@ import Controller from '../../interfaces/controller.interface';
 import commentModel from './comment.model';
 import { NextFunction } from 'connect';
 import { HttpException } from '../../exceptions/HttpException';
-import CreateCommentDto from './comment.dto';
+import CreateCommentDto, { UpdateCommentDto } from './comment.dto';
 import RequestWithUser from '../../interfaces/requestWithUser';
 import postModel from '../post/post.model';
 import authMiddleware from '../../utils/auth.middleware';
 import validationMiddleware from '../../utils/validation.middleware';
 import { NotFoundException } from '../../exceptions/NotFoundException';
-import e from 'express';
 
 export class CommentController implements Controller {
   public path: string = '/api/comment';
@@ -32,7 +31,12 @@ export class CommentController implements Controller {
         validationMiddleware(CreateCommentDto),
         this.createComment
       )
-      .delete(`${this.path}/:id`, this.deleteComment);
+      .delete(`${this.path}/:id`, this.deleteComment)
+      .patch(
+        `${this.path}/:id`,
+        validationMiddleware(UpdateCommentDto),
+        this.updateComment
+      );
   }
 
   private getCommentsInPost = async (
@@ -54,7 +58,7 @@ export class CommentController implements Controller {
     request: RequestWithUser,
     response: Response,
     next: NextFunction
-  ) => {
+  ): Promise<void> => {
     const post = await this.post.findById(request.params.id);
     if (post) {
       const data: CreateCommentDto = request.body;
@@ -80,7 +84,7 @@ export class CommentController implements Controller {
     request: RequestWithUser,
     response: Response,
     next: NextFunction
-  ) => {
+  ): Promise<void> => {
     if (request.user) {
       const comment = await this.comment.findById(request.params.id);
       if (comment) {
@@ -95,6 +99,27 @@ export class CommentController implements Controller {
       }
     } else {
       next(new HttpException(403, 'Forbidden'));
+    }
+  };
+
+  private updateComment = async (
+    request: RequestWithUser,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    if (request.user) {
+      const newData: UpdateCommentDto = request.body;
+      const newPost = this.comment.findByIdAndUpdate(
+        request.params.id,
+        newData
+      );
+      if (newPost) {
+        response.status(204).end();
+      } else {
+        next(new NotFoundException('Comment has not been found'));
+      }
+    } else {
+      next(new HttpException(401, 'Not a valid token'));
     }
   };
 }
