@@ -3,6 +3,8 @@ import * as bodyParser from 'body-parser';
 import { errorMiddleware } from './utils/error.middleware';
 import Controller from './interfaces/controller.interface';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
+import helmet from 'helmet';
 import 'dotenv/config';
 
 class App {
@@ -21,6 +23,8 @@ class App {
     this.app.use(bodyParser.json());
     this.app.use(errorMiddleware);
     this.app.use(cookieParser());
+    this.app.use(compression());
+    this.app.use(helmet());
   }
 
   private initControllers(controllers: Controller[]) {
