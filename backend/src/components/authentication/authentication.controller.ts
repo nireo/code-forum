@@ -79,7 +79,7 @@ export class AuthenticationController implements Controller {
     }
   };
 
-  private createCookie(tokenData: TokenData) {
+  public createCookie(tokenData: TokenData) {
     return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
   }
 
