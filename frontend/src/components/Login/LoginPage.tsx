@@ -9,19 +9,8 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-
-const CopyRight: React.FC = () => {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="inherit" href="https://github.com/nireo">
-        nireo
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-};
+import NavBar from '../layout/NavBar';
+import Copyright from '../Copyright';
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -72,6 +61,7 @@ const LoginPage: React.FC = () => {
   return (
     <div>
       <CssBaseline />
+      <NavBar />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
@@ -130,7 +120,7 @@ const LoginPage: React.FC = () => {
             </Grid>
           </form>
         </Paper>
-        <CopyRight />
+        <Copyright />
       </main>
     </div>
   );

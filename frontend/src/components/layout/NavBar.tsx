@@ -1,25 +1,63 @@
 import React from 'react';
-import { Toolbar, Button, Typography } from '@material-ui/core';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import ToolBar from '@material-ui/core/Toolbar';
+import Link from '@material-ui/core/Link';
+
+const useStyles = makeStyles(theme => ({
+  appBar: {
+    borderBottom: `1px sp;od ${theme.palette.divider}`
+  },
+  toolbarTitle: {
+    flexGrow: 1
+  },
+  toolbar: {
+    flexWrap: 'wrap'
+  },
+  link: {
+    margin: theme.spacing(1, 1.5)
+  }
+}));
 
 const NavBar: React.FC = () => {
+  const classes = useStyles();
   return (
-    <div>
-      <Toolbar>
-        <Button size="small">Subscribe</Button>
+    <AppBar
+      position="static"
+      color="default"
+      elevation={0}
+      className={classes.appBar}
+    >
+      <ToolBar className={classes.toolbar}>
         <Typography
-          component="h2"
-          variant="h5"
+          variant="h6"
           color="inherit"
-          align="center"
           noWrap
+          className={classes.toolbarTitle}
         >
           code forum
         </Typography>
-        <Button variant="outlined" size="small">
-          Sign up
-        </Button>
-      </Toolbar>
-    </div>
+        <nav>
+          <Link
+            variant="button"
+            color="textPrimary"
+            href="/posts"
+            className={classes.link}
+          >
+            Posts
+          </Link>
+          <Link
+            variant="button"
+            color="textPrimary"
+            href="/login"
+            className={classes.link}
+          >
+            Login
+          </Link>
+        </nav>
+      </ToolBar>
+    </AppBar>
   );
 };
 
