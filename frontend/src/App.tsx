@@ -4,6 +4,7 @@ import Main from './components/Main';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
 import LoginPage from './components/Login/LoginPage';
 import CreateAccount from './components/Login/CreateAccount';
+import CreatePost from './components/Posts/private/CreatePost';
 
 const App: React.FC = () => {
   return (
@@ -11,6 +12,7 @@ const App: React.FC = () => {
       <Route exact path="/" render={() => <Main />} />
       <Route exact path="/login" render={() => <LoginPage />} />
       <Route exact path="/signup" render={() => <CreateAccount />} />
+      <Route exact path="/create-post" render={() => <CreatePost />} />
     </Router>
   );
 };

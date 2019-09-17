@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
-import NavBar from '../layout/NavBar';
-import Copyright from '../Copyright';
+import NavBar from '../../layout/NavBar';
+import Copyright from '../../Copyright';
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -53,12 +54,9 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CreateAccount: React.FC = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [email, setEmail] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
+const CreatePost: React.FC = () => {
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const classes = useStyles();
   return (
     <div>
@@ -67,7 +65,7 @@ const CreateAccount: React.FC = () => {
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Create User
+            Create post
           </Typography>
           <form className={classes.form} noValidate>
             <TextField
@@ -75,53 +73,22 @@ const CreateAccount: React.FC = () => {
               margin="normal"
               required
               fullWidth
-              label="Username"
-              autoComplete="username"
+              label="Title"
               autoFocus
-              value={username}
-              onChange={({ target }) => setUsername(target.value)}
+              autoComplete="title"
+              value={title}
+              onChange={({ target }) => setTitle(target.value)}
             />
             <TextField
               variant="outlined"
               margin="normal"
               required
               fullWidth
-              label="Email"
-              autoComplete="email"
-              value={email}
-              onChange={({ target }) => setEmail(target.value)}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              label="Confirm Email"
-              autoComplete="Confirm Email"
-              value={confirmEmail}
-              onChange={({ target }) => setConfirmEmail(target.value)}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              type="password"
-              label="Password"
-              autoComplete="Password"
-              value={password}
-              onChange={({ target }) => setPassword(target.value)}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              type="password"
-              required
-              fullWidth
-              label="Confirm Password"
-              autoComplete="Confirm password"
-              value={confirmPassword}
-              onChange={({ target }) => setConfirmPassword(target.value)}
+              label="Content"
+              autoFocus
+              autoComplete="content"
+              value={content}
+              onChange={({ target }) => setContent(target.value)}
             />
             <Button
               type="submit"
@@ -129,11 +96,8 @@ const CreateAccount: React.FC = () => {
               color="primary"
               className={classes.submit}
             >
-              Sign In
+              Create post
             </Button>
-            <Link href="/login" variant="body2">
-              Already got a user? login
-            </Link>
           </form>
         </Paper>
         <Copyright />
@@ -142,4 +106,4 @@ const CreateAccount: React.FC = () => {
   );
 };
 
-export default CreateAccount;
+export default CreatePost;

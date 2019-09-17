@@ -4,6 +4,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import ToolBar from '@material-ui/core/Toolbar';
 import Link from '@material-ui/core/Link';
+import Code from '@material-ui/icons/Code';
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -36,7 +37,7 @@ const NavBar: React.FC = () => {
           noWrap
           className={classes.toolbarTitle}
         >
-          code forum
+          code forum <Code />
         </Typography>
         <nav>
           <Link

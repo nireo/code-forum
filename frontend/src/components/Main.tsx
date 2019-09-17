@@ -30,10 +30,24 @@ const Main: React.FC = () => {
       <CssBaseline />
       <NavBar />
       <Container component="main" className={classes.main} maxWidth="lg">
-        <Typography variant="h2">Welcome to code forum</Typography>
-        <Typography variant="subtitle1">
+        <Typography
+          variant="h2"
+          component="h1"
+          align="center"
+          color="textPrimary"
+          gutterBottom
+        >
+          Welcome to code forum
+        </Typography>
+        <Typography
+          variant="h5"
+          component="h1"
+          align="center"
+          color="textSecondary"
+          paragraph
+        >
           Code forum is a forum for discussing programming and learning new
-          languages. Anyone can join the conversation.
+          languages.
         </Typography>
       </Container>
       <footer className={classes.footer}>
