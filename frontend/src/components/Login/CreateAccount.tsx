@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
 import Checkbox from '@material-ui/core/Checkbox';
 import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
@@ -54,9 +53,12 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LoginPage: React.FC = () => {
+const CreateAccount: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [email, setEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
   const classes = useStyles();
   return (
     <div>
@@ -65,7 +67,7 @@ const LoginPage: React.FC = () => {
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
-            Login
+            Create User
           </Typography>
           <form className={classes.form} noValidate>
             <TextField
@@ -73,7 +75,7 @@ const LoginPage: React.FC = () => {
               margin="normal"
               required
               fullWidth
-              label="Username or Email"
+              label="Username"
               autoComplete="username"
               autoFocus
               value={username}
@@ -84,17 +86,42 @@ const LoginPage: React.FC = () => {
               margin="normal"
               required
               fullWidth
-              name="password"
-              label="Password"
+              label="Email"
+              autoComplete="email"
+              value={email}
+              onChange={({ target }) => setEmail(target.value)}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
+              label="Confirm Email"
+              autoComplete="Confirm Email"
+              value={confirmEmail}
+              onChange={({ target }) => setConfirmEmail(target.value)}
+            />
+            <TextField
+              variant="outlined"
+              margin="normal"
+              required
+              fullWidth
               type="password"
-              id="password"
-              autoComplete="current-password"
+              label="Password"
+              autoComplete="Password"
               value={password}
               onChange={({ target }) => setPassword(target.value)}
             />
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+            <TextField
+              variant="outlined"
+              margin="normal"
+              type="password"
+              required
+              fullWidth
+              label="Confirm Password"
+              autoComplete="Confirm password"
+              value={confirmPassword}
+              onChange={({ target }) => setConfirmPassword(target.value)}
             />
             <Button
               type="submit"
@@ -104,15 +131,14 @@ const LoginPage: React.FC = () => {
             >
               Sign In
             </Button>
-            <Link href="/signup" variant="body2">
-              Don't have a user? Sign up
+            <Link href="/login" variant="body2">
+              Already got a user? login
             </Link>
           </form>
         </Paper>
-        <Copyright />
       </main>
     </div>
   );
 };
 
-export default LoginPage;
+export default CreateAccount;
