@@ -10,6 +10,9 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "../layout/NavBar";
 import Copyright from "../Copyright";
+import Login from "../../interfaces/login.interface";
+import { connect } from "react-redux";
+import { logUserIn } from "../../reducers/userReducer";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -53,10 +56,21 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LoginPage: React.FC = () => {
+const LoginPage: React.FC = ({ logUserIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const classes = useStyles();
+
+  const handleLogin = async (): Promise<void> => {
+    if (username && password) {
+      const loginObject: Login = {
+        username,
+        password
+      };
+      await logUserIn(loginObject);
+    }
+  };
+
   return (
     <div>
       <CssBaseline />
@@ -66,7 +80,7 @@ const LoginPage: React.FC = () => {
           <Typography component="h1" variant="h4" align="center">
             Login
           </Typography>
-          <form className={classes.form} noValidate>
+          <form className={classes.form} noValidate onSubmit={handleLogin}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -114,4 +128,13 @@ const LoginPage: React.FC = () => {
   );
 };
 
-export default LoginPage;
+const mapStateToProps = (state: any) => {
+  return {
+    user: state.user
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  { logUserIn }
+)(LoginPage);
