@@ -1,20 +1,46 @@
-import React from 'react';
-import './App.css';
-import Main from './components/Main';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import LoginPage from './components/Login/LoginPage';
-import CreateAccount from './components/Login/CreateAccount';
-import CreatePost from './components/Posts/private/CreatePost';
+import React from "react";
+import { connect } from "react-redux";
+import "./App.css";
+import Main from "./components/Main";
+import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
+import LoginPage from "./components/Login/LoginPage";
+import CreateAccount from "./components/Login/CreateAccount";
+import CreatePost from "./components/Posts/private/CreatePost";
 
-const App: React.FC = () => {
+type Props = {
+  user?: object;
+};
+
+const App: React.FC<Props> = ({ user }) => {
   return (
     <Router>
       <Route exact path="/" render={() => <Main />} />
-      <Route exact path="/login" render={() => <LoginPage />} />
-      <Route exact path="/signup" render={() => <CreateAccount />} />
-      <Route exact path="/create-post" render={() => <CreatePost />} />
+      <Route
+        exact
+        path="/login"
+        render={() => (!user ? <LoginPage /> : <Redirect to="/" />)}
+      />
+      <Route
+        exact
+        path="/signup"
+        render={() => (!user ? <CreateAccount /> : <Redirect to="/" />)}
+      />
+      <Route
+        exact
+        path="/create-post"
+        render={() => (user ? <CreatePost /> : <Redirect to="/login" />)}
+      />
     </Router>
   );
 };
 
-export default App;
+const mapStateToProps = (state: any) => {
+  return {
+    user: state.user
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(App);

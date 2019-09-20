@@ -56,7 +56,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const LoginPage: React.FC = ({ logUserIn }) => {
+type Props = {
+  logUserIn: (loginObject: Login) => Promise<void>;
+};
+
+const LoginPage: React.FC<Props> = ({ logUserIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const classes = useStyles();
