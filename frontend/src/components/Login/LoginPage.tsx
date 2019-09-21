@@ -57,12 +57,13 @@ const useStyles = makeStyles(theme => ({
 }));
 
 type Props = {
-  logUserIn: (loginObject: Login) => Promise<void>;
+  logUserIn: (loginObject: Login, remember: boolean) => Promise<void>;
 };
 
 const LoginPage: React.FC<Props> = ({ logUserIn }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const classes = useStyles();
 
   const handleLogin = async (
@@ -74,7 +75,7 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
         username,
         password
       };
-      await logUserIn(loginObject);
+      await logUserIn(loginObject, rememberMe);
     }
   };
 
@@ -108,7 +109,13 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
               onChange={({ target }) => setPassword(target.value)}
             />
             <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
+              control={
+                <Checkbox
+                  value={rememberMe}
+                  color="primary"
+                  onClick={() => setRememberMe(true)}
+                />
+              }
               label="Remember me"
             />
             <Button
@@ -119,8 +126,6 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
             >
               Sign In
             </Button>
-            <button type="submit">Submit</button>
-
             <Link to="/signup">Don't have a user? Sign up</Link>
           </form>
         </Paper>

@@ -5,6 +5,7 @@ import Controller from "./interfaces/controller.interface";
 import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
+import cors from "cors";
 import "dotenv/config";
 
 class App {
@@ -25,6 +26,7 @@ class App {
     this.app.use(cookieParser());
     this.app.use(compression());
     this.app.use(helmet());
+    this.app.use(cors());
   }
 
   private initControllers(controllers: Controller[]) {

@@ -21,7 +21,7 @@ export class UserController implements Controller {
     this.router.get(this.path, this.getAllUsers);
     this.router.get(`${this.path}/:id`, this.getUserById);
     this.router
-      .all("/*", authMiddleware)
+      .all(`${this.path}/*`, authMiddleware)
       .patch(`${this.path}/:id`, this.updateUser)
       .delete(`${this.path}/:id`, this.deleteUser);
   }

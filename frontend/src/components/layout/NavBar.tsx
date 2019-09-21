@@ -58,6 +58,9 @@ const NavBar: React.FC = () => {
             <Link to="/login" className={classes.link}>
               Login
             </Link>
+            <Link to="/create-post" className={classes.link}>
+              Create post
+            </Link>
           </MaterialLink>
         </nav>
       </ToolBar>

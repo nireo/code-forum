@@ -65,6 +65,7 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   const handlePostCreation = async (
     event: FormEvent<HTMLFormElement>
   ): Promise<void> => {
+    event.preventDefault();
     if (title && content) {
       const newPost: CreatePostInterface = {
         title,

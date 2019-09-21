@@ -1,16 +1,16 @@
-import express, { Response, Router, Request } from 'express';
-import Controller from '../../interfaces/controller.interface';
-import postModel from './post.model';
-import { NextFunction } from 'connect';
-import { HttpException } from '../../exceptions/HttpException';
-import RequestWithUser from '../../interfaces/requestWithUser';
-import CreatePostDto, { UpdatePostDto } from './post.dto';
-import authMiddleware from '../../utils/auth.middleware';
-import validationMiddleware from '../../utils/validation.middleware';
-import { NotFoundException } from '../../exceptions/NotFoundException';
+import express, { Response, Router, Request } from "express";
+import Controller from "../../interfaces/controller.interface";
+import postModel from "./post.model";
+import { NextFunction } from "connect";
+import { HttpException } from "../../exceptions/HttpException";
+import RequestWithUser from "../../interfaces/requestWithUser";
+import CreatePostDto, { UpdatePostDto } from "./post.dto";
+import authMiddleware from "../../utils/auth.middleware";
+import validationMiddleware from "../../utils/validation.middleware";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 
 export class PostController implements Controller {
-  public path: string = '/api/post';
+  public path: string = "/api/post";
   public router: Router = express.Router();
   private post = postModel;
   constructor() {
@@ -21,7 +21,7 @@ export class PostController implements Controller {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
     this.router
-      .all('/*', authMiddleware)
+      .all(`${this.path}/*`, authMiddleware)
       .post(this.path, validationMiddleware(CreatePostDto), this.createPost)
       .patch(
         `${this.path}/:id`,
@@ -32,7 +32,7 @@ export class PostController implements Controller {
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
-    const posts = await this.post.find().populate('byUser');
+    const posts = await this.post.find().populate("byUser");
     response.json(posts);
   };
 
@@ -45,7 +45,7 @@ export class PostController implements Controller {
     if (post) {
       response.json(post);
     } else {
-      next(new HttpException(404, 'Post not found'));
+      next(new HttpException(404, "Post not found"));
     }
   };
 
@@ -61,10 +61,10 @@ export class PostController implements Controller {
         byUser: request.user._id
       });
       const saved = await newPost.save();
-      await saved.populate('byUser').execPopulate();
+      await saved.populate("byUser").execPopulate();
       response.json(saved);
     } else {
-      next(new HttpException(403, 'Forbidden'));
+      next(new HttpException(403, "Forbidden"));
     }
   };
 
@@ -78,7 +78,7 @@ export class PostController implements Controller {
     if (success) {
       response.send(204).end();
     } else {
-      next(new NotFoundException('Post was not found'));
+      next(new NotFoundException("Post was not found"));
     }
   };
 
@@ -97,10 +97,10 @@ export class PostController implements Controller {
       } else {
         // this is since most of the time 'findByIdAndUpdate' only returns
         // one type of error when the post has not been found.
-        next(new NotFoundException('Post has not been found'));
+        next(new NotFoundException("Post has not been found"));
       }
     } else {
-      next(new HttpException(401, 'Invalid token'));
+      next(new HttpException(401, "Invalid token"));
     }
   };
 }

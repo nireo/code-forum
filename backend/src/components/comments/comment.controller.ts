@@ -1,17 +1,17 @@
-import express, { Response, Router, Request } from 'express';
-import Controller from '../../interfaces/controller.interface';
-import commentModel from './comment.model';
-import { NextFunction } from 'connect';
-import { HttpException } from '../../exceptions/HttpException';
-import CreateCommentDto, { UpdateCommentDto } from './comment.dto';
-import RequestWithUser from '../../interfaces/requestWithUser';
-import postModel from '../post/post.model';
-import authMiddleware from '../../utils/auth.middleware';
-import validationMiddleware from '../../utils/validation.middleware';
-import { NotFoundException } from '../../exceptions/NotFoundException';
+import express, { Response, Router, Request } from "express";
+import Controller from "../../interfaces/controller.interface";
+import commentModel from "./comment.model";
+import { NextFunction } from "connect";
+import { HttpException } from "../../exceptions/HttpException";
+import CreateCommentDto, { UpdateCommentDto } from "./comment.dto";
+import RequestWithUser from "../../interfaces/requestWithUser";
+import postModel from "../post/post.model";
+import authMiddleware from "../../utils/auth.middleware";
+import validationMiddleware from "../../utils/validation.middleware";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 
 export class CommentController implements Controller {
-  public path: string = '/api/comment';
+  public path: string = "/api/comment";
   public router: Router = express.Router();
   private comment = commentModel;
   private post = postModel;
@@ -25,7 +25,7 @@ export class CommentController implements Controller {
     // in initializing all the comments on the whole website
     this.router.get(`${this.path}/:id`, this.getCommentsInPost);
     this.router
-      .all('/*', authMiddleware)
+      .all(`${this.path}/*`, authMiddleware)
       .post(
         `${this.path}/:id`,
         validationMiddleware(CreateCommentDto),
@@ -46,11 +46,11 @@ export class CommentController implements Controller {
   ): Promise<void> => {
     const comments = await this.comment
       .find({ toPost: request.params.id })
-      .populate('byUser');
+      .populate("byUser");
     if (comments) {
       response.json(comments);
     } else {
-      next(new HttpException(404, 'No comments found for post'));
+      next(new HttpException(404, "No comments found for post"));
     }
   };
 
@@ -73,10 +73,10 @@ export class CommentController implements Controller {
         const saved = await post.save();
         response.json(saved);
       } else {
-        next(new HttpException(403, 'Forbidden'));
+        next(new HttpException(403, "Forbidden"));
       }
     } else {
-      next(new NotFoundException('Post not found'));
+      next(new NotFoundException("Post not found"));
     }
   };
 
@@ -92,13 +92,13 @@ export class CommentController implements Controller {
           await this.comment.findByIdAndRemove(request.params.id);
           response.status(204).end();
         } else {
-          next(new HttpException(403, 'Forbidden'));
+          next(new HttpException(403, "Forbidden"));
         }
       } else {
-        next(new NotFoundException('Post was not found'));
+        next(new NotFoundException("Post was not found"));
       }
     } else {
-      next(new HttpException(403, 'Forbidden'));
+      next(new HttpException(403, "Forbidden"));
     }
   };
 
@@ -117,10 +117,10 @@ export class CommentController implements Controller {
       if (newPost) {
         response.json(newPost);
       } else {
-        next(new NotFoundException('Comment has not been found'));
+        next(new NotFoundException("Comment has not been found"));
       }
     } else {
-      next(new HttpException(401, 'Not a valid token'));
+      next(new HttpException(401, "Not a valid token"));
     }
   };
 }

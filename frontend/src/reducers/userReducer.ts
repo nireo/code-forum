@@ -13,14 +13,29 @@ const reducer = (state = null, action: any) => {
   }
 };
 
-export const logUserIn = (credentials: Login) => {
+export const logUserIn = (credentials: Login, remember: boolean) => {
   return async (dispatch: Dispatch) => {
     const userData = await users.logUserIn(credentials);
-    console.log(userData);
+    if (remember) {
+      window.localStorage.setItem("loggedUser", JSON.stringify(userData));
+    }
     if (userData) {
       dispatch({
         type: "LOG_USER_IN",
         data: userData
+      });
+    }
+  };
+};
+
+export const checkLocalStorage = () => {
+  return async (dispatch: Dispatch) => {
+    const user = window.localStorage.getItem("loggedUser");
+    if (user) {
+      const userInfoJson = JSON.parse(user);
+      dispatch({
+        type: "LOG_USER_IN",
+        data: userInfoJson
       });
     }
   };

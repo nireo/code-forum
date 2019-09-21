@@ -15,7 +15,9 @@ const getUserById = async (id: string) => {
 };
 
 const deleteUser = async (id: string) => {
-  const response = await axios.delete(`${baseUrl}/${id}`);
+  const response = await axios.delete(`${baseUrl}/${id}`, {
+    withCredentials: true
+  });
   return response.data;
 };
 
