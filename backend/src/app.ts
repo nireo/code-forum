@@ -1,4 +1,4 @@
-import express from "express";
+import express, { response } from "express";
 import * as bodyParser from "body-parser";
 import { errorMiddleware } from "./utils/error.middleware";
 import Controller from "./interfaces/controller.interface";
@@ -6,7 +6,6 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
 import "dotenv/config";
-import { UserController } from "./components/user/user.controller";
 
 class App {
   public app: express.Application;
@@ -26,20 +25,12 @@ class App {
     this.app.use(cookieParser());
     this.app.use(compression());
     this.app.use(helmet());
-
-    // just for a bit of testing
-    this.app.use((req, res) => {
-      console.log(req.body);
-      console.log(req.method);
-      console.log(req.path);
-    });
   }
 
   private initControllers(controllers: Controller[]) {
     controllers.forEach(controller => {
       this.app.use("/", controller.router);
     });
-    this.app.use("/", new UserController().router);
   }
 
   public listen() {

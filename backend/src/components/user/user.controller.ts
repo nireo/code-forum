@@ -1,15 +1,15 @@
-import express, { Response, Router, Request } from 'express';
-import User from './user.interface';
-import Controller from '../../interfaces/controller.interface';
-import userModel from './user.model';
-import { HttpException } from '../../exceptions/HttpException';
-import { NextFunction } from 'connect';
-import { NotFoundException } from '../../exceptions/NotFoundException';
-import RequestWithUser from '../../interfaces/requestWithUser';
-import authMiddleware from '../../utils/auth.middleware';
+import express, { Response, Router, Request } from "express";
+import User from "./user.interface";
+import Controller from "../../interfaces/controller.interface";
+import userModel from "./user.model";
+import { HttpException } from "../../exceptions/HttpException";
+import { NextFunction } from "connect";
+import { NotFoundException } from "../../exceptions/NotFoundException";
+import RequestWithUser from "../../interfaces/requestWithUser";
+import authMiddleware from "../../utils/auth.middleware";
 
 export class UserController implements Controller {
-  public path: string = '/api/user';
+  public path: string = "/api/user";
   public router: Router = express.Router();
   private user = userModel;
 
@@ -21,7 +21,7 @@ export class UserController implements Controller {
     this.router.get(this.path, this.getAllUsers);
     this.router.get(`${this.path}/:id`, this.getUserById);
     this.router
-      .all('/*', authMiddleware)
+      .all("/*", authMiddleware)
       .patch(`${this.path}/:id`, this.updateUser)
       .delete(`${this.path}/:id`, this.deleteUser);
   }
@@ -33,9 +33,9 @@ export class UserController implements Controller {
   ): Promise<void> => {
     const users = await this.user.find({});
     if (users) {
-      response.json(users);
+      response.send(users);
     } else {
-      next(new NotFoundException('No users have been found'));
+      next(new NotFoundException("No users have been found"));
     }
   };
 
@@ -68,7 +68,7 @@ export class UserController implements Controller {
       );
       response.json(user);
     } else {
-      next(new HttpException(401, 'Invalid token'));
+      next(new HttpException(401, "Invalid token"));
     }
   };
 
@@ -83,7 +83,7 @@ export class UserController implements Controller {
           response.status(204);
         } else {
           // post not found
-          next(new HttpException(404, 'User not found'));
+          next(new HttpException(404, "User not found"));
         }
       });
     }
