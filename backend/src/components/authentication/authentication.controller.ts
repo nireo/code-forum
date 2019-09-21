@@ -1,19 +1,19 @@
-import * as bcrypt from 'bcrypt';
-import express, { Router, Response, Request } from 'express';
-import userModel from '../user/user.model';
-import Controller from '../../interfaces/controller.interface';
-import validationMiddleware from '../../utils/validation.middleware';
-import CreateUserDto from '../user/user.dto';
-import LogInDto from './login.dto';
-import { HttpException } from '../../exceptions/HttpException';
-import { NotFoundException } from '../../exceptions/NotFoundException';
-import User from '../user/user.interface';
-import TokenData from '../../interfaces/token.data.interface';
-import DataStoredInToken from '../../interfaces/data.in.token.interface';
-import jwt from 'jsonwebtoken';
+import * as bcrypt from "bcrypt";
+import express, { Router, Response, Request } from "express";
+import userModel from "../user/user.model";
+import Controller from "../../interfaces/controller.interface";
+import validationMiddleware from "../../utils/validation.middleware";
+import CreateUserDto from "../user/user.dto";
+import LogInDto from "./login.dto";
+import { HttpException } from "../../exceptions/HttpException";
+import { NotFoundException } from "../../exceptions/NotFoundException";
+import User from "../user/user.interface";
+import TokenData from "../../interfaces/token.data.interface";
+import DataStoredInToken from "../../interfaces/data.in.token.interface";
+import jwt from "jsonwebtoken";
 
 export class AuthenticationController implements Controller {
-  public path: string = '/api/auth';
+  public path: string = "/api/auth";
   public router: Router = express.Router();
   private user = userModel;
 
@@ -42,7 +42,7 @@ export class AuthenticationController implements Controller {
   ) => {
     const userData: CreateUserDto = request.body;
     if (await this.user.findOne({ email: userData.email })) {
-      next(new HttpException(400, 'User already exists'));
+      next(new HttpException(400, "User already exists"));
     } else {
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       const user = await this.user.create({
@@ -50,7 +50,7 @@ export class AuthenticationController implements Controller {
         password: hashedPassword
       });
       const tokenData = this.createToken(user);
-      response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
+      response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
       response.send(user);
     }
   };
@@ -61,7 +61,7 @@ export class AuthenticationController implements Controller {
     next: express.NextFunction
   ) => {
     const logInData: LogInDto = request.body;
-    const user = await this.user.findOne({ email: logInData.email });
+    const user = await this.user.findOne({ username: logInData.username });
     if (user) {
       const isPasswordMatching = await bcrypt.compare(
         logInData.password,
@@ -69,13 +69,13 @@ export class AuthenticationController implements Controller {
       );
       if (isPasswordMatching) {
         const tokenData = this.createToken(user);
-        response.setHeader('Set-Cookie', [this.createCookie(tokenData)]);
+        response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
         response.send(user);
       } else {
-        next(new HttpException(403, 'Forbidden'));
+        next(new HttpException(403, "Forbidden"));
       }
     } else {
-      next(new NotFoundException('Not found'));
+      next(new NotFoundException("Not found"));
     }
   };
 
@@ -88,7 +88,7 @@ export class AuthenticationController implements Controller {
       _id: user._id
     };
     const expiresIn = 60 * 60;
-    const secret: string = 'EnvSecret';
+    const secret: string = "EnvSecret";
     return {
       expiresIn,
       token: jwt.sign(dataStoredInToken, secret, { expiresIn })
@@ -97,7 +97,7 @@ export class AuthenticationController implements Controller {
 
   private logOut = (request: Request, response: Response) => {
     // clear the header
-    response.setHeader('Set-Cookie', ['Authorization=;Max-age=0']);
+    response.setHeader("Set-Cookie", ["Authorization=;Max-age=0"]);
     // if success send 200 status code
     response.send(200);
   };

@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Checkbox from "@material-ui/core/Checkbox";
-import Link from "@material-ui/core/Link";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -13,6 +12,7 @@ import Copyright from "../Copyright";
 import Login from "../../interfaces/login.interface";
 import { connect } from "react-redux";
 import { logUserIn } from "../../reducers/userReducer";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -65,7 +65,10 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
   const [password, setPassword] = useState("");
   const classes = useStyles();
 
-  const handleLogin = async (): Promise<void> => {
+  const handleLogin = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    event.preventDefault();
     if (username && password) {
       const loginObject: Login = {
         username,
@@ -84,14 +87,12 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
           <Typography component="h1" variant="h4" align="center">
             Login
           </Typography>
-          <form className={classes.form} noValidate onSubmit={handleLogin}>
+          <form className={classes.form} onSubmit={handleLogin}>
             <TextField
               variant="outlined"
               margin="normal"
-              required
               fullWidth
               label="Username or Email"
-              autoComplete="username"
               autoFocus
               value={username}
               onChange={({ target }) => setUsername(target.value)}
@@ -99,13 +100,10 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
             <TextField
               variant="outlined"
               margin="normal"
-              required
               fullWidth
               name="password"
               label="Password"
               type="password"
-              id="password"
-              autoComplete="current-password"
               value={password}
               onChange={({ target }) => setPassword(target.value)}
             />
@@ -121,9 +119,9 @@ const LoginPage: React.FC<Props> = ({ logUserIn }) => {
             >
               Sign In
             </Button>
-            <Link href="/signup" variant="body2">
-              Don't have a user? Sign up
-            </Link>
+            <button type="submit">Submit</button>
+
+            <Link to="/signup">Don't have a user? Sign up</Link>
           </form>
         </Paper>
         <Copyright />

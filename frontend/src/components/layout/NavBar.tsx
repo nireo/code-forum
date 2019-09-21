@@ -1,10 +1,11 @@
-import React from 'react';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import AppBar from '@material-ui/core/AppBar';
-import ToolBar from '@material-ui/core/Toolbar';
-import Link from '@material-ui/core/Link';
-import Code from '@material-ui/icons/Code';
+import React from "react";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import AppBar from "@material-ui/core/AppBar";
+import ToolBar from "@material-ui/core/Toolbar";
+import MaterialLink from "@material-ui/core/Link";
+import { Link } from "react-router-dom";
+import Code from "@material-ui/icons/Code";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -14,7 +15,7 @@ const useStyles = makeStyles(theme => ({
     flexGrow: 1
   },
   toolbar: {
-    flexWrap: 'wrap'
+    flexWrap: "wrap"
   },
   link: {
     margin: theme.spacing(1, 1.5)
@@ -40,22 +41,24 @@ const NavBar: React.FC = () => {
           code forum <Code />
         </Typography>
         <nav>
-          <Link
+          <MaterialLink
             variant="button"
             color="textPrimary"
-            href="/posts"
             className={classes.link}
           >
-            Posts
-          </Link>
-          <Link
+            <Link to="/posts" className={classes.link}>
+              Posts
+            </Link>
+          </MaterialLink>
+          <MaterialLink
             variant="button"
             color="textPrimary"
-            href="/login"
             className={classes.link}
           >
-            Login
-          </Link>
+            <Link to="/login" className={classes.link}>
+              Login
+            </Link>
+          </MaterialLink>
         </nav>
       </ToolBar>
     </AppBar>

@@ -1,11 +1,11 @@
-import { IsString } from 'class-validator';
+import { IsString } from "class-validator";
 
 class LogInDto {
   @IsString()
-  public email: string | undefined;
+  public username!: string;
 
   @IsString()
-  public password: string | undefined;
+  public password!: string;
 }
 
 export default LogInDto;

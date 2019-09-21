@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import Link from "@material-ui/core/Link";
+import { Link } from "react-router-dom";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -61,18 +61,17 @@ const CreateAccount: React.FC = () => {
   const [confirmEmail, setConfirmEmail] = useState("");
   const classes = useStyles();
 
-  const createAccount = async (): Promise<void> => {
+  const createAccount = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    event.preventDefault();
     if (confirmEmail === email && confirmPassword === password) {
-      if (
-        window.confirm("Are you sure you want to create user named " + username)
-      ) {
-        const newUserObject: CreateUser = {
-          username,
-          password,
-          email
-        };
-        await userService.registerUser(newUserObject);
-      }
+      const newUserObject: CreateUser = {
+        username,
+        password,
+        email
+      };
+      await userService.registerUser(newUserObject);
     }
   };
 
@@ -85,7 +84,7 @@ const CreateAccount: React.FC = () => {
           <Typography component="h1" variant="h4" align="center">
             Create User
           </Typography>
-          <form className={classes.form} noValidate onSubmit={createAccount}>
+          <form className={classes.form} onSubmit={createAccount}>
             <TextField
               variant="outlined"
               margin="normal"
@@ -147,9 +146,7 @@ const CreateAccount: React.FC = () => {
             >
               Sign In
             </Button>
-            <Link href="/login" variant="body2">
-              Already got a user? login
-            </Link>
+            <Link to="/login">Already got a user? login</Link>
           </form>
         </Paper>
         <Copyright />

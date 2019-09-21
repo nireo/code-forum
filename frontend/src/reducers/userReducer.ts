@@ -1,11 +1,12 @@
-import Login from '../interfaces/login.interface';
-import users from '../services/users';
+import Login from "../interfaces/login.interface";
+import users from "../services/users";
+import { Dispatch } from "redux";
 
 const reducer = (state = null, action: any) => {
   switch (action.type) {
-    case 'LOG_USER_IN':
+    case "LOG_USER_IN":
       return action.data;
-    case 'LOG_USER_OUT':
+    case "LOG_USER_OUT":
       return null;
     default:
       return state;
@@ -13,11 +14,12 @@ const reducer = (state = null, action: any) => {
 };
 
 export const logUserIn = (credentials: Login) => {
-  return async (dispatch: any) => {
+  return async (dispatch: Dispatch) => {
     const userData = await users.logUserIn(credentials);
+    console.log(userData);
     if (userData) {
       dispatch({
-        type: 'LOG_USER_IN',
+        type: "LOG_USER_IN",
         data: userData
       });
     }
@@ -25,7 +27,7 @@ export const logUserIn = (credentials: Login) => {
 };
 
 export const logUserOut = () => {
-  return { type: 'LOG_USER_OUT' };
+  return { type: "LOG_USER_OUT" };
 };
 
 export default reducer;

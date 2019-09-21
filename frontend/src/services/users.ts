@@ -1,8 +1,8 @@
-import axios from 'axios';
-import CreateUser from '../interfaces/user.interface';
-import Login from '../interfaces/login.interface';
-const baseUrl: string = '/api/user';
-const authUrl: string = '/api/auth';
+import axios from "axios";
+import CreateUser from "../interfaces/user.interface";
+import Login from "../interfaces/login.interface";
+const baseUrl: string = "/api/user";
+const authUrl: string = "/api/auth";
 
 const getUsers = async () => {
   const response = await axios.get(baseUrl);
@@ -25,7 +25,7 @@ const registerUser = async (newUser: CreateUser) => {
 };
 
 const logUserIn = async (credentials: Login) => {
-  const response = await axios.post(`${authUrl}/login`);
+  const response = await axios.post(`${authUrl}/login`, credentials);
   return response.data;
 };
 
