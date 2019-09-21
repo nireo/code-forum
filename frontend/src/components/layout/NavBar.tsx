@@ -3,7 +3,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import AppBar from "@material-ui/core/AppBar";
 import ToolBar from "@material-ui/core/Toolbar";
-import MaterialLink from "@material-ui/core/Link";
 import { Link } from "react-router-dom";
 import Code from "@material-ui/icons/Code";
 
@@ -24,6 +23,12 @@ const useStyles = makeStyles(theme => ({
 
 const NavBar: React.FC = () => {
   const classes = useStyles();
+
+  const linkStyle = {
+    color: "black",
+    textDecoration: "none"
+  };
+
   return (
     <AppBar
       position="static"
@@ -41,27 +46,18 @@ const NavBar: React.FC = () => {
           code forum <Code />
         </Typography>
         <nav>
-          <MaterialLink
-            variant="button"
-            color="textPrimary"
-            className={classes.link}
-          >
-            <Link to="/posts" className={classes.link}>
-              Posts
-            </Link>
-          </MaterialLink>
-          <MaterialLink
-            variant="button"
-            color="textPrimary"
-            className={classes.link}
-          >
-            <Link to="/login" className={classes.link}>
-              Login
-            </Link>
-            <Link to="/create-post" className={classes.link}>
-              Create post
-            </Link>
-          </MaterialLink>
+          <Link style={linkStyle} to="/posts" className={classes.link}>
+            posts
+          </Link>
+          <Link style={linkStyle} to="/login" className={classes.link}>
+            login
+          </Link>
+          <Link style={linkStyle} to="/create-post" className={classes.link}>
+            create post
+          </Link>
+          <Link style={linkStyle} to="/users" className={classes.link}>
+            users
+          </Link>
         </nav>
       </ToolBar>
     </AppBar>

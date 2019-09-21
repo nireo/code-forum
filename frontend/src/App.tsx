@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { connect } from "react-redux";
 import "./App.css";
 import Main from "./components/Main";
@@ -7,12 +7,21 @@ import LoginPage from "./components/Login/LoginPage";
 import CreateAccount from "./components/Login/CreateAccount";
 import CreatePost from "./components/Posts/private/CreatePost";
 import PostMainPage from "./components/Posts/public/PostMainPage";
+import { checkLocalStorage } from "./reducers/userReducer";
+import UserMainPage from "./components/Users/public/UserMainPage";
 
 type Props = {
   user?: object;
+  checkLocalStorage: () => Promise<void>;
 };
 
-const App: React.FC<Props> = ({ user }) => {
+const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
+  useEffect(() => {
+    if (!user) {
+      checkLocalStorage();
+    }
+  }, [checkLocalStorage, user]);
+
   return (
     <Router>
       <Route exact path="/" render={() => <Main />} />
@@ -31,6 +40,7 @@ const App: React.FC<Props> = ({ user }) => {
         path="/create-post"
         render={() => (user ? <CreatePost /> : <Redirect to="/login" />)}
       />
+      <Route exact path="/users" render={() => <UserMainPage />} />
       <Route exact path="/posts" render={() => <PostMainPage />} />
     </Router>
   );
@@ -44,5 +54,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  null
+  { checkLocalStorage }
 )(App);
