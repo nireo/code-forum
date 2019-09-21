@@ -1,5 +1,6 @@
 import { Dispatch } from "redux";
 import postService from "../services/posts";
+import { CreatePostInterface } from "../interfaces/post.interface";
 
 const reducer = (state = [], action: any) => {
   switch (action.type) {
@@ -33,6 +34,16 @@ export const getSinglePost = (id: string) => {
     dispatch({
       type: "INIT_SINGLE",
       data: post
+    });
+  };
+};
+
+export const CreatePost = (post: CreatePostInterface) => {
+  return async (dispatch: Dispatch) => {
+    const newPost = await postService.createPost(post);
+    dispatch({
+      type: "INIT_SINGLE",
+      data: newPost
     });
   };
 };

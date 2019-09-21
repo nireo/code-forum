@@ -1,5 +1,6 @@
-import axios from 'axios';
-const baseUrl = '/api/posts';
+import axios from "axios";
+import { CreatePostInterface } from "../interfaces/post.interface";
+const baseUrl = "/api/posts";
 
 const getPostById = async (id: string) => {
   const response = await axios.get(`${baseUrl}/${id}`);
@@ -16,7 +17,7 @@ const deletePost = async (id: string) => {
   return response.data;
 };
 
-const createPost = async (newPost: object) => {
+const createPost = async (newPost: CreatePostInterface) => {
   const response = await axios.post(baseUrl, newPost);
   return response.data;
 };

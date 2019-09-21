@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
 import "dotenv/config";
+import { UserController } from "./components/user/user.controller";
 
 class App {
   public app: express.Application;
@@ -38,6 +39,7 @@ class App {
     controllers.forEach(controller => {
       this.app.use("/", controller.router);
     });
+    this.app.use("/", new UserController().router);
   }
 
   public listen() {

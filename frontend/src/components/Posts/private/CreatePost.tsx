@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
@@ -7,6 +7,9 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import NavBar from "../../layout/NavBar";
 import Copyright from "../../Copyright";
+import { connect } from "react-redux";
+import { CreatePost } from "../../../reducers/postReducer";
+import { CreatePostInterface } from "../../../interfaces/post.interface";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -50,10 +53,27 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const CreatePost: React.FC = () => {
+type Props = {
+  CreatePost?: any;
+};
+
+const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const classes = useStyles();
+
+  const handlePostCreation = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    if (title && content) {
+      const newPost: CreatePostInterface = {
+        title,
+        content
+      };
+      await CreatePost(newPost);
+    }
+  };
+
   return (
     <div>
       <CssBaseline />
@@ -63,7 +83,11 @@ const CreatePost: React.FC = () => {
           <Typography component="h1" variant="h4" align="center">
             Create post
           </Typography>
-          <form className={classes.form} noValidate>
+          <form
+            className={classes.form}
+            noValidate
+            onSubmit={handlePostCreation}
+          >
             <TextField
               variant="outlined"
               margin="normal"
@@ -102,4 +126,7 @@ const CreatePost: React.FC = () => {
   );
 };
 
-export default CreatePost;
+export default connect(
+  null,
+  { CreatePost }
+)(CreatePostForm);
