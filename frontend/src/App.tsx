@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Redirect } from "react-router-dom";
 import LoginPage from "./components/Login/LoginPage";
 import CreateAccount from "./components/Login/CreateAccount";
 import CreatePost from "./components/Posts/private/CreatePost";
+import PostMainPage from "./components/Posts/public/PostMainPage";
 
 type Props = {
   user?: object;
@@ -30,6 +31,7 @@ const App: React.FC<Props> = ({ user }) => {
         path="/create-post"
         render={() => (user ? <CreatePost /> : <Redirect to="/login" />)}
       />
+      <Route exact path="/posts" render={() => <PostMainPage />} />
     </Router>
   );
 };
