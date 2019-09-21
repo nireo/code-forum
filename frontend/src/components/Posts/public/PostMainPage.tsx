@@ -6,7 +6,7 @@ import Loading from "../../Loading";
 import Container from "@material-ui/core/Container";
 
 type Props = {
-  posts?: any;
+  posts?: Array<object>;
 };
 
 const PostMainPage: React.FC<Props> = ({ posts }) => {
