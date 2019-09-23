@@ -5,6 +5,27 @@ import NavBar from "../../layout/NavBar";
 import Loading from "../../Loading";
 import Container from "@material-ui/core/Container";
 import { initPosts } from "../../../reducers/postReducer";
+import { makeStyles } from "@material-ui/core/styles";
+
+const useStyles = makeStyles(theme => ({
+  post: {
+    position: "relative",
+    backgroundColor: theme.palette.grey[800],
+    color: theme.palette.common.white,
+    marginBottom: theme.spacing(4),
+    backgroundSize: "cover",
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center"
+  },
+  postContent: {
+    position: "relative",
+    padding: theme.spacing(3),
+    [theme.breakpoints.up("md")]: {
+      padding: theme.spacing(6),
+      paddingRight: 0
+    }
+  }
+}));
 
 type Props = {
   posts?: Array<object>;
@@ -14,6 +35,7 @@ type Props = {
 const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
   // since we don't want to only show a loading bar
   const [requested, setRequested] = useState(false);
+  const classes = useStyles();
   useEffect(() => {
     if (posts) {
       if (!requested && posts.length === 0) {

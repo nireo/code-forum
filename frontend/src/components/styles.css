@@ -14,7 +14,7 @@
   margin: 1px;
   border-radius: 50%;
   border: 5px solid #cef;
-  border-color: #cef transparent #cef transparent;
+  border-color: #000000 transparent #000000 transparent;
   animation: loader 1.2s linear infinite;
 }
 

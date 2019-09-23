@@ -27,7 +27,9 @@ const registerUser = async (newUser: CreateUser) => {
 };
 
 const logUserIn = async (credentials: Login) => {
-  const response = await axios.post(`${authUrl}/login`, credentials);
+  const response = await axios.post(`${authUrl}/login`, credentials, {
+    withCredentials: true
+  });
   return response.data;
 };
 
