@@ -7,7 +7,7 @@ const authUrl: string = "/api/auth";
 let token: string = "";
 
 const setToken = (token: string): void => {
-  token = token;
+  token = `bearer ${token}`;
 };
 
 const getConfig = () => ({
@@ -25,9 +25,7 @@ const getUserById = async (id: string) => {
 };
 
 const deleteUser = async (id: string) => {
-  const response = await axios.delete(`${baseUrl}/${id}`, {
-    withCredentials: true
-  });
+  const response = await axios.delete(`${baseUrl}/${id}`, getConfig());
   return response.data;
 };
 
@@ -43,17 +41,11 @@ const logUserIn = async (credentials: Login) => {
   return response.data;
 };
 
-const logUserOut = async () => {
-  const response = await axios.post(`${authUrl}/logout`);
-  return response.data;
-};
-
 export default {
   getUsers,
   getUserById,
   deleteUser,
   registerUser,
   logUserIn,
-  logUserOut,
   setToken
 };

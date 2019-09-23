@@ -1,6 +1,7 @@
 import Login from "../interfaces/login.interface";
 import users from "../services/users";
 import { Dispatch } from "redux";
+import { setTokens } from "../utils/helpers";
 
 const reducer = (state = null, action: any) => {
   switch (action.type) {
@@ -16,6 +17,7 @@ const reducer = (state = null, action: any) => {
 export const logUserIn = (credentials: Login, remember: boolean) => {
   return async (dispatch: Dispatch) => {
     const userData = await users.logUserIn(credentials);
+    setTokens(userData.tokenData.token);
     if (remember) {
       window.localStorage.setItem("loggedUser", JSON.stringify(userData));
     }

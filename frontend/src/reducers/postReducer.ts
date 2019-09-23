@@ -40,7 +40,6 @@ export const getSinglePost = (id: string) => {
 
 export const CreatePost = (post: CreatePostInterface) => {
   return async (dispatch: Dispatch) => {
-    await postService.setToken();
     const newPost = await postService.createPost(post);
     dispatch({
       type: "INIT_SINGLE",

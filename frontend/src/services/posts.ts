@@ -5,11 +5,8 @@ const baseUrl = "/api/post";
 
 let token: string = "";
 
-const setToken = (): void => {
-  const cookieValue = Cookies.get("Authorization");
-  if (cookieValue) {
-    token = token;
-  }
+const setToken = (token: string): void => {
+  token = `bearer ${token}`;
 };
 
 const getConfig = () => ({
