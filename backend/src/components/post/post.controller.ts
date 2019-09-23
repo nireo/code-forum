@@ -31,6 +31,11 @@ export class PostController implements Controller {
       this.createPost
     );
     this.router.delete(`${this.path}/:id`, this.removePost);
+    this.router.patch(
+      `${this.path}/:id`,
+      validationMiddleware(UpdatePostDto),
+      this.updatePost
+    );
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -121,21 +126,34 @@ export class PostController implements Controller {
   };
 
   private updatePost = async (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (request.user) {
-      const newData: UpdatePostDto = request.body;
-      const newPost = this.post.findByIdAndUpdate(request.params.id, newData, {
-        new: true
-      });
-      if (newPost) {
-        response.json(newPost);
+    const token = this.getToken(request);
+    const id: string = request.params.id;
+    if (token) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      const user = await this.user.findById(decodedToken._id);
+      if (user) {
+        if (this.checkForUserOwnership(user.posts, id)) {
+          const newData: UpdatePostDto = request.body;
+          const newPost = this.post.findByIdAndUpdate(id, newData, {
+            new: true
+          });
+          if (newPost) {
+            response.json(newPost);
+          } else {
+            // this is since most of the time 'findByIdAndUpdate' only returns
+            // one type of error when the post has not been found.
+            next(new NotFoundException("Post has not been found"));
+          }
+          next(new HttpException(403, "Forbidden"));
+        } else {
+          next(new HttpException(403, "Forbidden"));
+        }
       } else {
-        // this is since most of the time 'findByIdAndUpdate' only returns
-        // one type of error when the post has not been found.
-        next(new NotFoundException("Post has not been found"));
+        next(new HttpException(403, "Forbidden"));
       }
     } else {
       next(new HttpException(401, "Invalid token"));
