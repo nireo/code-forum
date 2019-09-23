@@ -30,6 +30,7 @@ export class PostController implements Controller {
       validationMiddleware(CreatePostDto),
       this.createPost
     );
+    this.router.delete(`${this.path}/:id`, this.removePost);
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -82,17 +83,40 @@ export class PostController implements Controller {
     }
   };
 
+  private checkForUserOwnership = (
+    posts: Array<string>,
+    postId: string
+  ): Boolean => {
+    const checkForItem = posts.find(id => id === postId);
+    if (checkForItem) {
+      return true;
+    }
+    return false;
+  };
+
   private removePost = async (
     request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const id = request.params.id;
-    const success = await this.post.findByIdAndRemove(id);
-    if (success) {
-      response.send(204).end();
+    const token = this.getToken(request);
+    if (token) {
+      const id = request.params.id;
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      const user = await this.user.findById(decodedToken._id);
+      if (user) {
+        if (this.checkForUserOwnership(user.posts, id)) {
+          const success = await this.post.findByIdAndRemove(id);
+          if (success) {
+            response.send(204).end();
+          } else {
+            next(new NotFoundException("Post was not found"));
+          }
+        }
+        next(new HttpException(403, "Forbidden"));
+      }
     } else {
-      next(new NotFoundException("Post was not found"));
+      next(new HttpException(401, "Invalid token"));
     }
   };
 

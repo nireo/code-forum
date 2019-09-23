@@ -1,5 +1,5 @@
-import mongoose from 'mongoose';
-import Post from './post.interface';
+import mongoose from "mongoose";
+import Post from "./post.interface";
 
 const postScheme: mongoose.Schema = new mongoose.Schema({
   title: {
@@ -12,7 +12,7 @@ const postScheme: mongoose.Schema = new mongoose.Schema({
   },
   byUser: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: "User"
   },
   likes: {
     type: Number,
@@ -24,16 +24,20 @@ const postScheme: mongoose.Schema = new mongoose.Schema({
   },
   comments: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Comment'
+    ref: "Comment"
+  },
+  posts: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Posts"
   }
 });
 
-postScheme.set('toJSON', {
+postScheme.set("toJSON", {
   transform: (document, object) => {
     delete object.__v;
   }
 });
 
-const post = mongoose.model<Post & mongoose.Document>('Post', postScheme);
+const post = mongoose.model<Post & mongoose.Document>("Post", postScheme);
 
 export default post;
