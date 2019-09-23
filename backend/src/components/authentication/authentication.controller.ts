@@ -70,7 +70,11 @@ export class AuthenticationController implements Controller {
       if (isPasswordMatching) {
         const tokenData = this.createToken(user);
         response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
-        response.send(user);
+        const userObject: object = {
+          user,
+          tokenData
+        };
+        response.send(userObject);
       } else {
         next(new HttpException(403, "Forbidden"));
       }

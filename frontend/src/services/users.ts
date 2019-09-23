@@ -4,6 +4,16 @@ import Login from "../interfaces/login.interface";
 const baseUrl: string = "/api/user";
 const authUrl: string = "/api/auth";
 
+let token: string = "";
+
+const setToken = (token: string): void => {
+  token = token;
+};
+
+const getConfig = () => ({
+  headers: { Authorization: token }
+});
+
 const getUsers = async () => {
   const response = await axios.get(baseUrl);
   return response.data;
@@ -44,5 +54,6 @@ export default {
   deleteUser,
   registerUser,
   logUserIn,
-  logUserOut
+  logUserOut,
+  setToken
 };
