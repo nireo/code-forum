@@ -11,6 +11,7 @@ import User from "../user/user.interface";
 import TokenData from "../../interfaces/token.data.interface";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
 import jwt from "jsonwebtoken";
+import { ResponseUser } from "./user.res.interface";
 
 export class AuthenticationController implements Controller {
   public path: string = "/api/auth";
@@ -32,7 +33,6 @@ export class AuthenticationController implements Controller {
       validationMiddleware(LogInDto),
       this.logIn
     );
-    this.router.post(`${this.path}/logout`, this.logOut);
   }
 
   private registration = async (
@@ -50,8 +50,11 @@ export class AuthenticationController implements Controller {
         password: hashedPassword
       });
       const tokenData = this.createToken(user);
-      response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
-      response.send(user);
+      const userReturn: ResponseUser = {
+        user,
+        tokenData
+      };
+      response.send(userReturn);
     }
   };
 
@@ -69,12 +72,11 @@ export class AuthenticationController implements Controller {
       );
       if (isPasswordMatching) {
         const tokenData = this.createToken(user);
-        response.setHeader("Set-Cookie", [this.createCookie(tokenData)]);
-        const userObject: object = {
+        const userObject: ResponseUser = {
           user,
           tokenData
         };
-        response.send(userObject);
+        response.json(userObject);
       } else {
         next(new HttpException(403, "Forbidden"));
       }
@@ -83,26 +85,16 @@ export class AuthenticationController implements Controller {
     }
   };
 
-  public createCookie(tokenData: TokenData) {
-    return `Authorization=${tokenData.token}; HttpOnly; Max-Age=${tokenData.expiresIn}`;
-  }
-
   private createToken(user: User): TokenData {
     const dataStoredInToken: DataStoredInToken = {
       _id: user._id
     };
-    const expiresIn = 60 * 60;
+    // 60 * 60 * 24 is one day
+    const expiresIn = 60 * 60 * 24;
     const secret: string = "EnvSecret";
     return {
       expiresIn,
       token: jwt.sign(dataStoredInToken, secret, { expiresIn })
     };
   }
-
-  private logOut = (request: Request, response: Response) => {
-    // clear the header
-    response.setHeader("Set-Cookie", ["Authorization=;Max-age=0"]);
-    // if success send 200 status code
-    response.send(200);
-  };
 }
