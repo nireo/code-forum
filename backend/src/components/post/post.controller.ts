@@ -8,11 +8,16 @@ import CreatePostDto, { UpdatePostDto } from "./post.dto";
 import authMiddleware from "../../utils/auth.middleware";
 import validationMiddleware from "../../utils/validation.middleware";
 import { NotFoundException } from "../../exceptions/NotFoundException";
+import jwt from "jsonwebtoken";
+import DataStoredInToken from "../../interfaces/data.in.token.interface";
+import userModel from "../user/user.model";
 
 export class PostController implements Controller {
   public path: string = "/api/post";
   public router: Router = express.Router();
   private post = postModel;
+  private user = userModel;
+
   constructor() {
     this.initRoutes();
   }
@@ -20,15 +25,11 @@ export class PostController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router
-      .all(`${this.path}/*`, authMiddleware)
-      .post(this.path, validationMiddleware(CreatePostDto), this.createPost)
-      .patch(
-        `${this.path}/:id`,
-        validationMiddleware(UpdatePostDto),
-        this.updatePost
-      )
-      .delete(`${this.path}/:id`, this.removePost);
+    this.router.post(
+      this.path,
+      validationMiddleware(CreatePostDto),
+      this.createPost
+    );
   }
 
   private getAllPosts = async (request: Request, response: Response) => {
@@ -49,22 +50,35 @@ export class PostController implements Controller {
     }
   };
 
+  private getToken = (request: Request): string | null => {
+    const authorization = request.get("authorization");
+    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+      return authorization.substring(7);
+    }
+    return null;
+  };
+
   private createPost = async (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
     const data: CreatePostDto = request.body;
-    if (request.user) {
-      const newPost = new this.post({
-        ...data,
-        byUser: request.user._id
-      });
-      const saved = await newPost.save();
-      await saved.populate("byUser").execPopulate();
-      response.json(saved);
-    } else {
-      next(new HttpException(403, "Forbidden"));
+    const token: string | null = this.getToken(request);
+    if (token && data) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      const user = await this.user.findById(decodedToken._id);
+      if (user) {
+        const newPost = new this.post({
+          ...data,
+          byUser: user._id
+        });
+        const saved = await newPost.save();
+        await saved.populate("byUser").execPopulate();
+        response.json(saved);
+      } else {
+        next(new HttpException(403, "Forbidden"));
+      }
     }
   };
 

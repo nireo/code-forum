@@ -1,6 +1,5 @@
 import axios from "axios";
 import { CreatePostInterface } from "../interfaces/post.interface";
-import Cookies from "js-cookie";
 const baseUrl = "/api/post";
 
 let token: string = "";

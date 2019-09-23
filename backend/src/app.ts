@@ -1,4 +1,4 @@
-import express, { response } from "express";
+import express from "express";
 import * as bodyParser from "body-parser";
 import { errorMiddleware } from "./utils/error.middleware";
 import Controller from "./interfaces/controller.interface";
