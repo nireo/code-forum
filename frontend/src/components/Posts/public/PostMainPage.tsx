@@ -6,6 +6,14 @@ import Loading from "../../Loading";
 import Container from "@material-ui/core/Container";
 import { initPosts } from "../../../reducers/postReducer";
 import { makeStyles } from "@material-ui/core/styles";
+import Grid from "@material-ui/core/Grid";
+import { PostInterface } from "../../../interfaces/post.interface";
+import Card from "@material-ui/core/Card";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardMedia from "@material-ui/core/CardMedia";
+import Typography from "@material-ui/core/Typography";
+import Hidden from "@material-ui/core/Hidden";
 
 const useStyles = makeStyles(theme => ({
   post: {
@@ -26,11 +34,20 @@ const useStyles = makeStyles(theme => ({
       padding: theme.spacing(6),
       paddingRight: 0
     }
+  },
+  card: {
+    display: "flex"
+  },
+  cardMedia: {
+    width: 160
+  },
+  cardDetails: {
+    flex: 1
   }
 }));
 
 type Props = {
-  posts?: Array<object>;
+  posts: PostInterface[];
   initPosts: any;
 };
 
@@ -50,9 +67,34 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
     <div>
       <CssBaseLine />
       <NavBar />
-      <Container maxWidth="sm">
+      <Container maxWidth="md" style={{ paddingTop: "3rem" }}>
         {posts && posts.length !== 0 ? (
-          <p>Posts loaded</p>
+          posts.map(p => (
+            <Grid item key={p._id} xs={12} md={12}>
+              <CardActionArea>
+                <Card className={classes.card}>
+                  <div className={classes.cardDetails}>
+                    <CardContent>
+                      <Typography>{p.title}</Typography>
+                      <Typography variant="subtitle1" color="textSecondary">
+                        @{p.byUser.username}
+                      </Typography>
+                      <Typography variant="subtitle1" paragraph>
+                        {p.content}
+                      </Typography>
+                    </CardContent>
+                  </div>
+                  <Hidden xsDown>
+                    <CardMedia
+                      className={classes.cardMedia}
+                      image="https://source.unsplash.com/1600x900/?code,coding,programming"
+                      title="code image"
+                    />
+                  </Hidden>
+                </Card>
+              </CardActionArea>
+            </Grid>
+          ))
         ) : (
           <div style={{ alignItems: "center" }}>
             <Loading />
