@@ -11,9 +11,8 @@ import { PostInterface } from "../../../interfaces/post.interface";
 import Card from "@material-ui/core/Card";
 import CardActionArea from "@material-ui/core/CardActionArea";
 import CardContent from "@material-ui/core/CardContent";
-import CardMedia from "@material-ui/core/CardMedia";
 import Typography from "@material-ui/core/Typography";
-import Hidden from "@material-ui/core/Hidden";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   post: {
@@ -21,17 +20,14 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme.palette.grey[800],
     color: theme.palette.common.white,
     marginBottom: theme.spacing(4),
-    backgroundImage:
-      "url(https://source.unsplash.com/1600x900/?code,coding,programming)",
     backgroundSize: "cover",
     backgroundRepeat: "no-repeat",
     backgroundPosition: "center"
   },
   postContent: {
     position: "relative",
-    padding: theme.spacing(1.5),
     [theme.breakpoints.up("md")]: {
-      padding: theme.spacing(6),
+      padding: theme.spacing(1),
       paddingRight: 0
     }
   },
@@ -43,6 +39,13 @@ const useStyles = makeStyles(theme => ({
   },
   cardDetails: {
     flex: 1
+  },
+  sidebarBox: {
+    padding: theme.spacing(2),
+    backgroundColor: theme.palette.grey[200]
+  },
+  mainGrid: {
+    marginTop: theme.spacing(3)
   }
 }));
 
@@ -63,43 +66,103 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
       }
     }
   }, [posts, initPosts, requested]);
+
+  const programmingSubjects = [
+    {
+      link: "/python",
+      name: "Python"
+    },
+    {
+      link: "/js",
+      name: "Javascript"
+    },
+    {
+      link: "/competetive",
+      name: "Competetive Programming"
+    }
+  ];
+
+  const miscSubjects = [
+    {
+      link: "/books",
+      name: "Books"
+    },
+    {
+      link: "/random",
+      name: "Random"
+    }
+  ];
+
   return (
     <div>
       <CssBaseLine />
-      <NavBar />
-      <Container maxWidth="md" style={{ paddingTop: "3rem" }}>
+      <Container maxWidth="md" style={{ paddingTop: "1rem" }}>
         {posts && posts.length !== 0 ? (
           posts.map(p => (
-            <Grid item key={p._id} xs={12} md={12}>
-              <CardActionArea>
-                <Card className={classes.card}>
-                  <div className={classes.cardDetails}>
-                    <CardContent>
-                      <Typography
-                        component="h1"
-                        variant="h4"
-                        color="inherit"
-                        gutterBottom
-                      >
-                        {p.title}
-                      </Typography>
-                      <Typography variant="subtitle1" color="textSecondary">
-                        @{p.byUser.username}
-                      </Typography>
-                      <Typography variant="subtitle1" paragraph>
-                        {p.content}
-                      </Typography>
-                    </CardContent>
-                  </div>
-                  <Hidden xsDown>
-                    <CardMedia
-                      className={classes.cardMedia}
-                      image="https://source.unsplash.com/1600x900/?code,coding,programming"
-                      title="code image"
-                    />
-                  </Hidden>
-                </Card>
-              </CardActionArea>
+            <Grid container className={classes.mainGrid}>
+              <Grid item key={p._id} xs={12} md={8}>
+                <CardActionArea>
+                  <Card className={classes.card}>
+                    <div className={classes.cardDetails}>
+                      <CardContent>
+                        <Typography
+                          component="h6"
+                          variant="h6"
+                          color="inherit"
+                          gutterBottom
+                        >
+                          {p.title}
+                        </Typography>
+                        <Typography variant="subtitle1" color="textSecondary">
+                          by @{p.byUser.username} in category
+                        </Typography>
+                      </CardContent>
+                    </div>
+                  </Card>
+                </CardActionArea>
+              </Grid>
+              <Grid item xs={12} md={4} style={{ paddingLeft: "1rem" }}>
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  style={{ marginBottom: "0" }}
+                >
+                  Programming
+                </Typography>
+                {programmingSubjects.map(s => (
+                  <Link
+                    style={{
+                      display: "block",
+                      color: "#23374d",
+                      textDecoration: "none"
+                    }}
+                    key={s.name}
+                    to={s.link}
+                  >
+                    {s.name}
+                  </Link>
+                ))}
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  style={{ paddingTop: "2rem", marginBottom: "0" }}
+                >
+                  Misc
+                </Typography>
+                {miscSubjects.map(s => (
+                  <Link
+                    style={{
+                      display: "block",
+                      color: "#23374d",
+                      textDecoration: "none"
+                    }}
+                    key={s.name}
+                    to={s.link}
+                  >
+                    {s.name}
+                  </Link>
+                ))}
+              </Grid>
             </Grid>
           ))
         ) : (

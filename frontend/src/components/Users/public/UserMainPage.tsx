@@ -33,7 +33,6 @@ const UserMainPage: React.FC<Props> = ({ users, initAllUsers }) => {
   return (
     <div>
       <CssBaseline />
-      <NavBar />
       <Container maxWidth="md">
         <Table size="small">
           <TableHead>

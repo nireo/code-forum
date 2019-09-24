@@ -1,16 +1,16 @@
-import React from 'react';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import NavBar from './layout/NavBar';
-import Copyright from './Copyright';
+import React from "react";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import Container from "@material-ui/core/Container";
+import NavBar from "./layout/NavBar";
+import Copyright from "./Copyright";
 
 const useStyles = makeStyles(theme => ({
   root: {
-    display: 'flex',
-    flexDirection: 'column',
-    minHeight: '100vh'
+    display: "flex",
+    flexDirection: "column",
+    minHeight: "100vh"
   },
   main: {
     marginTop: theme.spacing(8),
@@ -18,8 +18,8 @@ const useStyles = makeStyles(theme => ({
   },
   footer: {
     padding: theme.spacing(2),
-    marginTop: 'auto',
-    backgroundColor: 'white'
+    marginTop: "auto",
+    backgroundColor: "white"
   }
 }));
 
@@ -28,7 +28,6 @@ const Main: React.FC = () => {
   return (
     <div className={classes.root}>
       <CssBaseline />
-      <NavBar />
       <Container component="main" className={classes.main} maxWidth="lg">
         <Typography
           variant="h2"

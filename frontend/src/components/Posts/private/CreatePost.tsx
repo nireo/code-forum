@@ -78,7 +78,6 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   return (
     <div>
       <CssBaseline />
-      <NavBar />
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
