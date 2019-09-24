@@ -57,7 +57,7 @@ export class PostController implements Controller {
   };
 
   private getToken = (request: Request): string | null => {
-    const authorization = request.get("authorization");
+    const authorization: string | undefined = request.get("authorization");
     if (authorization && authorization.toLowerCase().startsWith("bearer")) {
       return authorization.substring(7);
     }

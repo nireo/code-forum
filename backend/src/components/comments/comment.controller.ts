@@ -9,12 +9,16 @@ import postModel from "../post/post.model";
 import authMiddleware from "../../utils/auth.middleware";
 import validationMiddleware from "../../utils/validation.middleware";
 import { NotFoundException } from "../../exceptions/NotFoundException";
+import jwt from "jsonwebtoken";
+import userModel from "../user/user.model";
+import DataStoredInToken from "../../interfaces/data.in.token.interface";
 
 export class CommentController implements Controller {
   public path: string = "/api/comment";
   public router: Router = express.Router();
   private comment = commentModel;
   private post = postModel;
+  private user = userModel;
 
   constructor() {
     this.initRoutes();
@@ -24,20 +28,26 @@ export class CommentController implements Controller {
     // comments won't get a 'get all method' since there isn't any point
     // in initializing all the comments on the whole website
     this.router.get(`${this.path}/:id`, this.getCommentsInPost);
-    this.router
-      .all(`${this.path}/*`, authMiddleware)
-      .post(
-        `${this.path}/:id`,
-        validationMiddleware(CreateCommentDto),
-        this.createComment
-      )
-      .delete(`${this.path}/:id`, this.deleteComment)
-      .patch(
-        `${this.path}/:id`,
-        validationMiddleware(UpdateCommentDto),
-        this.updateComment
-      );
+    this.router.post(
+      `${this.path}/:id`,
+      validationMiddleware(CreateCommentDto),
+      this.createComment
+    );
+    this.router.delete(`${this.path}/:id`, this.deleteComment);
+    this.router.patch(
+      `${this.path}/:id`,
+      validationMiddleware(UpdateCommentDto),
+      this.updateComment
+    );
   }
+
+  private getToken = (request: Request): string | null => {
+    const authorization: string | undefined = request.get("authorization");
+    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+      return authorization.substring(7);
+    }
+    return null;
+  };
 
   private getCommentsInPost = async (
     request: Request,
@@ -55,50 +65,66 @@ export class CommentController implements Controller {
   };
 
   private createComment = async (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const post = await this.post.findById(request.params.id);
-    if (post) {
-      const data: CreateCommentDto = request.body;
-      if (request.user) {
-        const newPost = new this.comment({
-          ...data,
-          byUser: request.user._id,
-          toPost: post._id
-        });
-        const savedComment = await newPost.save();
-        post.comments = post.comments.concat(savedComment._id);
-        const saved = await post.save();
-        response.json(saved);
-      } else {
+    const token = this.getToken(request);
+    if (token) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      if (decodedToken) {
+        const post = await this.post.findById(request.params.id);
+        if (post) {
+          const user = await this.user.findById(decodedToken._id);
+          const data: CreateCommentDto = request.body;
+          if (user) {
+            const newPost = new this.comment({
+              ...data,
+              byUser: user._id,
+              toPost: post._id
+            });
+            const savedComment = await newPost.save();
+            user.comments = user.comments.concat(savedComment._id);
+            post.comments = post.comments.concat(savedComment._id);
+            const saved = await post.save();
+            await user.save();
+            response.json(saved);
+          } else {
+            next(new HttpException(403, "Forbidden"));
+          }
+        } else {
+          next(new NotFoundException("Post not found"));
+        }
         next(new HttpException(403, "Forbidden"));
       }
-    } else {
-      next(new NotFoundException("Post not found"));
+      next(new HttpException(403, "Forbidden"));
     }
   };
 
   private deleteComment = async (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (request.user) {
-      const comment = await this.comment.findById(request.params.id);
-      if (comment) {
-        if (comment.byUser === request.user._id) {
-          await this.comment.findByIdAndRemove(request.params.id);
-          response.status(204).end();
+    const token = this.getToken(request);
+    if (token) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      const user = await this.user.findById(decodedToken._id);
+      if (user) {
+        const comment = await this.comment.findById(request.params.id);
+        if (comment) {
+          if (comment.byUser === user._id) {
+            await this.comment.findByIdAndRemove(request.params.id);
+            response.status(204).end();
+          } else {
+            next(new HttpException(403, "Forbidden"));
+          }
         } else {
-          next(new HttpException(403, "Forbidden"));
+          next(new NotFoundException("Post was not found"));
         }
       } else {
-        next(new NotFoundException("Post was not found"));
+        next(new HttpException(403, "Forbidden"));
       }
-    } else {
-      next(new HttpException(403, "Forbidden"));
     }
   };
 
