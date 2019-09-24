@@ -5,6 +5,8 @@ import AppBar from "@material-ui/core/AppBar";
 import ToolBar from "@material-ui/core/Toolbar";
 import { Link } from "react-router-dom";
 import Code from "@material-ui/icons/Code";
+import { connect } from "react-redux";
+import { User } from "../../interfaces/user.interface";
 
 const useStyles = makeStyles(theme => ({
   appBar: {
@@ -21,7 +23,11 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const NavBar: React.FC = () => {
+type Props = {
+  user?: User;
+};
+
+const NavBar: React.FC<Props> = ({ user }) => {
   const classes = useStyles();
 
   const linkStyle = {
@@ -49,9 +55,12 @@ const NavBar: React.FC = () => {
           <Link style={linkStyle} to="/posts" className={classes.link}>
             posts
           </Link>
-          <Link style={linkStyle} to="/login" className={classes.link}>
-            login
-          </Link>
+          {!user && (
+            <Link style={linkStyle} to="/login" className={classes.link}>
+              login
+            </Link>
+          )}
+
           <Link style={linkStyle} to="/create-post" className={classes.link}>
             create post
           </Link>
@@ -64,4 +73,13 @@ const NavBar: React.FC = () => {
   );
 };
 
-export default NavBar;
+const mapStateToProps = (state: any) => {
+  return {
+    user: state.user
+  };
+};
+
+export default connect(
+  mapStateToProps,
+  null
+)(NavBar);

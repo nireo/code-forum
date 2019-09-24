@@ -9,6 +9,7 @@ import CreatePost from "./components/Posts/private/CreatePost";
 import PostMainPage from "./components/Posts/public/PostMainPage";
 import { checkLocalStorage } from "./reducers/userReducer";
 import UserMainPage from "./components/Users/public/UserMainPage";
+import SinglePostView from "./components/Posts/public/SinglePostView";
 
 type Props = {
   user?: object;
@@ -42,6 +43,11 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
       />
       <Route exact path="/users" render={() => <UserMainPage />} />
       <Route exact path="/posts" render={() => <PostMainPage />} />
+      <Route
+        exact
+        path="/posts/:id"
+        render={({ match }) => <SinglePostView id={match.params.id} />}
+      />
     </Router>
   );
 };

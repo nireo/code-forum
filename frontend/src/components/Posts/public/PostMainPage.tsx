@@ -29,7 +29,7 @@ const useStyles = makeStyles(theme => ({
   },
   postContent: {
     position: "relative",
-    padding: theme.spacing(3),
+    padding: theme.spacing(1.5),
     [theme.breakpoints.up("md")]: {
       padding: theme.spacing(6),
       paddingRight: 0
@@ -75,7 +75,14 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
                 <Card className={classes.card}>
                   <div className={classes.cardDetails}>
                     <CardContent>
-                      <Typography>{p.title}</Typography>
+                      <Typography
+                        component="h1"
+                        variant="h4"
+                        color="inherit"
+                        gutterBottom
+                      >
+                        {p.title}
+                      </Typography>
                       <Typography variant="subtitle1" color="textSecondary">
                         @{p.byUser.username}
                       </Typography>
