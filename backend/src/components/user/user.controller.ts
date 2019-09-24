@@ -7,6 +7,8 @@ import { NextFunction } from "connect";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import RequestWithUser from "../../interfaces/requestWithUser";
 import authMiddleware from "../../utils/auth.middleware";
+import jwt from "jsonwebtoken";
+import DataStoredInToken from "../../interfaces/data.in.token.interface";
 
 export class UserController implements Controller {
   public path: string = "/api/user";
@@ -20,11 +22,17 @@ export class UserController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllUsers);
     this.router.get(`${this.path}/:id`, this.getUserById);
-    this.router
-      .all(`${this.path}/*`, authMiddleware)
-      .patch(`${this.path}/:id`, this.updateUser)
-      .delete(`${this.path}/:id`, this.deleteUser);
+    this.router.patch(`${this.path}/:id`, this.updateUser);
+    this.router.delete(`${this.path}/:id`, this.deleteUser);
   }
+
+  private getToken = (request: Request): string | null => {
+    const authorization: string | undefined = request.get("authorization");
+    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+      return authorization.substring(7);
+    }
+    return null;
+  };
 
   private getAllUsers = async (
     request: Request,
@@ -55,37 +63,45 @@ export class UserController implements Controller {
   };
 
   private updateUser = async (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (request.user) {
-      const userData: User = request.body;
-      const user = await this.user.findByIdAndUpdate(
-        request.user._id,
-        userData,
-        { new: true }
-      );
-      response.json(user);
-    } else {
-      next(new HttpException(401, "Invalid token"));
+    const token = this.getToken(request);
+    if (token) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      if (decodedToken) {
+        const userData: User = request.body;
+        const user = await this.user.findByIdAndUpdate(
+          decodedToken._id,
+          userData,
+          { new: true }
+        );
+        response.json(user);
+      } else {
+        next(new HttpException(401, "Invalid token"));
+      }
     }
   };
 
   private deleteUser = (
-    request: RequestWithUser,
+    request: Request,
     response: Response,
     next: express.NextFunction
   ): void => {
-    if (request.user) {
-      this.user.findByIdAndDelete(request.user._id).then(success => {
-        if (success) {
-          response.status(204);
-        } else {
-          // post not found
-          next(new HttpException(404, "User not found"));
-        }
-      });
+    const token = this.getToken(request);
+    if (token) {
+      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
+      if (decodedToken) {
+        this.user.findByIdAndDelete(decodedToken._id).then(success => {
+          if (success) {
+            response.status(204);
+          } else {
+            // post not found
+            next(new HttpException(404, "User not found"));
+          }
+        });
+      }
     }
   };
 }
