@@ -1,8 +1,11 @@
 import { Dispatch } from "redux";
 import postService from "../services/posts";
-import { CreatePostInterface } from "../interfaces/post.interface";
+import {
+  CreatePostInterface,
+  PostInterface
+} from "../interfaces/post.interface";
 
-const reducer = (state = [], action: any) => {
+const reducer = (state: PostInterface[] = [], action: any) => {
   switch (action.type) {
     case "INIT_POSTS":
       return action.data;
@@ -13,6 +16,12 @@ const reducer = (state = [], action: any) => {
         return action.data;
       }
       return [...state, action.data];
+    case "ADD_TO_EXISTING":
+      let copyState = state;
+      action.data.forEach((post: PostInterface | never) => {
+        copyState = [...state, post];
+      });
+      return copyState;
     default:
       return state;
   }
@@ -44,6 +53,16 @@ export const CreatePost = (post: CreatePostInterface) => {
     dispatch({
       type: "INIT_SINGLE",
       data: newPost
+    });
+  };
+};
+
+export const getPostsByCategory = (category: string) => {
+  return async (dispatch: Dispatch) => {
+    const posts = await postService.getPostsFromCategory(category);
+    dispatch({
+      type: "ADD_TO_EXISTING",
+      data: posts
     });
   };
 };

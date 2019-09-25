@@ -11,5 +11,6 @@ export interface PostInterface {
   byUser: User;
   likes: number;
   dislikes: number;
+  category: string;
   _id: string;
 }
