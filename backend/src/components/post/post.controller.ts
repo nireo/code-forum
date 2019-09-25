@@ -3,9 +3,7 @@ import Controller from "../../interfaces/controller.interface";
 import postModel from "./post.model";
 import { NextFunction } from "connect";
 import { HttpException } from "../../exceptions/HttpException";
-import RequestWithUser from "../../interfaces/requestWithUser";
 import CreatePostDto, { UpdatePostDto } from "./post.dto";
-import authMiddleware from "../../utils/auth.middleware";
 import validationMiddleware from "../../utils/validation.middleware";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
@@ -25,7 +23,7 @@ export class PostController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
-    this.router.get(`${this.path}/:category`, this.getPostsFromCategory);
+    this.router.get(`${this.path}/c/:category`, this.getPostsFromCategory);
     this.router.post(
       this.path,
       validationMiddleware(CreatePostDto),

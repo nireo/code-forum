@@ -5,7 +5,6 @@ import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
-import NavBar from "../../layout/NavBar";
 import Copyright from "../../Copyright";
 import { connect } from "react-redux";
 import { CreatePost } from "../../../reducers/postReducer";

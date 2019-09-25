@@ -16,6 +16,8 @@ import { checkLocalStorage } from "./reducers/userReducer";
 import UserMainPage from "./components/Users/public/UserMainPage";
 import SinglePostView from "./components/Posts/public/SinglePostView";
 import NavBar from "./components/layout/NavBar";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import CategoryPage from "./components/Posts/public/CategoryPage";
 
 type Props = {
   user?: object;
@@ -31,6 +33,7 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
 
   return (
     <Router>
+      <CssBaseline />
       <NavBar />
       <Switch>
         <Route exact path="/" render={() => <Main />} />
@@ -55,6 +58,14 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
           exact
           path="/posts/:id"
           render={({ match }) => <SinglePostView id={match.params.id} />}
+        />
+        <Route
+          exact
+          path="/programming/:category"
+          render={({ match }) => (
+            <CategoryPage category={match.params.category} />
+          )}
+        />
         />
       </Switch>
     </Router>

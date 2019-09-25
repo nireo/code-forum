@@ -32,4 +32,16 @@ const createPost = async (newPost: CreatePostInterface) => {
   return response.data;
 };
 
-export default { deletePost, getPostById, getPosts, createPost, setToken };
+const getPostsFromCategory = async (category: string) => {
+  const response = await axios.get(`${baseUrl}/c/${category}`);
+  return response.data;
+};
+
+export default {
+  deletePost,
+  getPostById,
+  getPosts,
+  createPost,
+  setToken,
+  getPostsFromCategory
+};

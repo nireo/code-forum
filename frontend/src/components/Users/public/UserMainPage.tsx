@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { initAllUsers } from "../../../reducers/usersReducer";
 import Loading from "../../Loading";
-import NavBar from "../../layout/NavBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";

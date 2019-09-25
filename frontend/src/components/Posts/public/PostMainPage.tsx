@@ -137,7 +137,7 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
                       textDecoration: "none"
                     }}
                     key={s.name}
-                    to={s.link}
+                    to={`/programming${s.link}`}
                   >
                     {s.name}
                   </Link>
@@ -157,7 +157,7 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
                       textDecoration: "none"
                     }}
                     key={s.name}
-                    to={s.link}
+                    to={`/misc${s.link}`}
                   >
                     {s.name}
                   </Link>
