@@ -66,6 +66,13 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
             <CategoryPage category={match.params.category} />
           )}
         />
+        <Route
+          exact
+          path="/misc/:category"
+          render={({ match }) => (
+            <CategoryPage category={match.params.category} />
+          )}
+        />
         />
       </Switch>
     </Router>

@@ -2,6 +2,9 @@ import React, { useEffect, useState } from "react";
 import { PostInterface } from "../../../interfaces/post.interface";
 import { connect } from "react-redux";
 import { getPostsByCategory } from "../../../reducers/postReducer";
+import Container from "@material-ui/core/Container";
+import Loading from "../../Loading";
+import Post from "../Post";
 
 type Props = {
   category: string;
@@ -18,7 +21,15 @@ const CategoryPage: React.FC<Props> = ({ category, posts }) => {
       getPostsByCategory(category);
     }
   }, [category, posts, filteredPosts, setFilteredPosts]);
-  return <div></div>;
+  return (
+    <Container maxWidth="md" style={{ paddingTop: "1rem" }}>
+      {filteredPosts === undefined ? (
+        <Loading />
+      ) : (
+        filteredPosts.map(p => <Post post={p} />)
+      )}
+    </Container>
+  );
 };
 
 const mapStateToProps = (state: any, ownProps: any) => {
