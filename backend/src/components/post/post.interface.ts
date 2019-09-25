@@ -5,6 +5,7 @@ interface Post {
   dislikes: number;
   byUser: string;
   comments: Comment[];
+  category: string;
 }
 
 export default Post;

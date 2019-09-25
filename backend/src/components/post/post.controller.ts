@@ -25,6 +25,7 @@ export class PostController implements Controller {
   public initRoutes() {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
+    this.router.get(`${this.path}/:category`, this.getPostsFromCategory);
     this.router.post(
       this.path,
       validationMiddleware(CreatePostDto),
@@ -157,6 +158,26 @@ export class PostController implements Controller {
       }
     } else {
       next(new HttpException(401, "Invalid token"));
+    }
+  };
+
+  private getPostsFromCategory = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    const results = await this.post.find({});
+    const filteredResults = results.filter(
+      r => r.category === request.params.category
+    );
+    if (filteredResults.length >= 1) {
+      response.json(filteredResults);
+    } else {
+      next(
+        new NotFoundException(
+          `Posts in category ${request.params.category} have not been found`
+        )
+      );
     }
   };
 }

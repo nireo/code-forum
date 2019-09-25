@@ -6,6 +6,9 @@ class CreatePostDto {
 
   @IsString()
   public content!: string;
+
+  @IsString()
+  public category!: string;
 }
 
 export class UpdatePostDto {

@@ -29,6 +29,10 @@ const postScheme: mongoose.Schema = new mongoose.Schema({
   posts: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Posts"
+  },
+  category: {
+    type: String,
+    required: true
   }
 });
 

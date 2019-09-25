@@ -14,7 +14,7 @@ import { User } from "../../../interfaces/user.interface";
 
 type Props = {
   users?: User[];
-  initAllUsers: any;
+  initAllUsers: () => void;
 };
 
 const UserMainPage: React.FC<Props> = ({ users, initAllUsers }) => {
