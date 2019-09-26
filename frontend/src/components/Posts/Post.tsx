@@ -41,25 +41,27 @@ type Props = {
 const Post: React.FC<Props> = ({ post }) => {
   const classes = useStyles();
   return (
-    <CardActionArea>
-      <Card className={classes.card}>
-        <div className={classes.cardDetails}>
-          <CardContent>
-            <Typography
-              component="h6"
-              variant="h6"
-              color="inherit"
-              gutterBottom
-            >
-              {post.title}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-              by @{post.byUser.username} in category
-            </Typography>
-          </CardContent>
-        </div>
-      </Card>
-    </CardActionArea>
+    <div style={{ marginTop: "0.5rem" }}>
+      <CardActionArea>
+        <Card className={classes.card}>
+          <div className={classes.cardDetails}>
+            <CardContent>
+              <Typography
+                component="h6"
+                variant="h6"
+                color="inherit"
+                gutterBottom
+              >
+                {post.title}
+              </Typography>
+              <Typography variant="subtitle1" color="textSecondary">
+                by @{post.byUser.username} in category {post.category}
+              </Typography>
+            </CardContent>
+          </div>
+        </Card>
+      </CardActionArea>
+    </div>
   );
 };
 

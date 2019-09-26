@@ -76,13 +76,12 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
     event: FormEvent<HTMLFormElement>
   ): Promise<void> => {
     event.preventDefault();
-    if (title && content) {
-      const newPost: CreatePostInterface = {
-        title,
-        content
-      };
-      await CreatePost(newPost);
-    }
+    const newPost: CreatePostInterface = {
+      title,
+      content,
+      category: categories.category
+    };
+    await CreatePost(newPost);
   };
 
   const handleChange = (
