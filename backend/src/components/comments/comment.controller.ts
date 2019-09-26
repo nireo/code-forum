@@ -54,13 +54,17 @@ export class CommentController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const comments = await this.comment
-      .find({ toPost: request.params.id })
-      .populate("byUser");
-    if (comments) {
-      response.json(comments);
-    } else {
-      next(new HttpException(404, "No comments found for post"));
+    try {
+      const comments = await this.comment
+        .find({ toPost: request.params.id })
+        .populate("byUser");
+      if (comments) {
+        response.json(comments);
+      } else {
+        next(new HttpException(404, "No comments found for post"));
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -69,35 +73,42 @@ export class CommentController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = this.getToken(request);
-    if (token) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      if (decodedToken) {
-        const post = await this.post.findById(request.params.id);
-        if (post) {
-          const user = await this.user.findById(decodedToken._id);
-          const data: CreateCommentDto = request.body;
-          if (user) {
-            const newPost = new this.comment({
-              ...data,
-              byUser: user._id,
-              toPost: post._id
-            });
-            const savedComment = await newPost.save();
-            user.comments = user.comments.concat(savedComment._id);
-            post.comments = post.comments.concat(savedComment._id);
-            const saved = await post.save();
-            await user.save();
-            response.json(saved);
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          const post = await this.post.findById(request.params.id);
+          if (post) {
+            const user = await this.user.findById(decodedToken._id);
+            const data: CreateCommentDto = request.body;
+            if (user) {
+              const newPost = new this.comment({
+                ...data,
+                byUser: user._id,
+                toPost: post._id
+              });
+              const savedComment = await newPost.save();
+              user.comments = user.comments.concat(savedComment._id);
+              post.comments = post.comments.concat(savedComment._id);
+              const saved = await post.save();
+              await user.save();
+              response.json(saved);
+            } else {
+              next(new HttpException(403, "Forbidden"));
+            }
           } else {
-            next(new HttpException(403, "Forbidden"));
+            next(new NotFoundException("Post not found"));
           }
-        } else {
-          next(new NotFoundException("Post not found"));
+          next(new HttpException(403, "Forbidden"));
         }
         next(new HttpException(403, "Forbidden"));
       }
-      next(new HttpException(403, "Forbidden"));
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -106,25 +117,32 @@ export class CommentController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = this.getToken(request);
-    if (token) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      const user = await this.user.findById(decodedToken._id);
-      if (user) {
-        const comment = await this.comment.findById(request.params.id);
-        if (comment) {
-          if (comment.byUser === user._id) {
-            await this.comment.findByIdAndRemove(request.params.id);
-            response.status(204).end();
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        const user = await this.user.findById(decodedToken._id);
+        if (user) {
+          const comment = await this.comment.findById(request.params.id);
+          if (comment) {
+            if (comment.byUser === user._id) {
+              await this.comment.findByIdAndRemove(request.params.id);
+              response.status(204).end();
+            } else {
+              next(new HttpException(403, "Forbidden"));
+            }
           } else {
-            next(new HttpException(403, "Forbidden"));
+            next(new NotFoundException("Post was not found"));
           }
         } else {
-          next(new NotFoundException("Post was not found"));
+          next(new HttpException(403, "Forbidden"));
         }
-      } else {
-        next(new HttpException(403, "Forbidden"));
       }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -133,20 +151,24 @@ export class CommentController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    if (request.user) {
-      const newData: UpdateCommentDto = request.body;
-      const newPost = this.comment.findByIdAndUpdate(
-        request.params.id,
-        newData,
-        { new: true }
-      );
-      if (newPost) {
-        response.json(newPost);
+    try {
+      if (request.user) {
+        const newData: UpdateCommentDto = request.body;
+        const newPost = this.comment.findByIdAndUpdate(
+          request.params.id,
+          newData,
+          { new: true }
+        );
+        if (newPost) {
+          response.json(newPost);
+        } else {
+          next(new NotFoundException("Comment has not been found"));
+        }
       } else {
-        next(new NotFoundException("Comment has not been found"));
+        next(new HttpException(401, "Not a valid token"));
       }
-    } else {
-      next(new HttpException(401, "Not a valid token"));
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 }

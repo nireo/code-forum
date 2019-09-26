@@ -40,21 +40,25 @@ export class AuthenticationController implements Controller {
     response: express.Response,
     next: express.NextFunction
   ) => {
-    const userData: CreateUserDto = request.body;
-    if (await this.user.findOne({ email: userData.email })) {
-      next(new HttpException(400, "User already exists"));
-    } else {
-      const hashedPassword = await bcrypt.hash(userData.password, 10);
-      const user = await this.user.create({
-        ...userData,
-        password: hashedPassword
-      });
-      const tokenData = this.createToken(user);
-      const userReturn: ResponseUser = {
-        user,
-        tokenData
-      };
-      response.send(userReturn);
+    try {
+      const userData: CreateUserDto = request.body;
+      if (await this.user.findOne({ email: userData.email })) {
+        next(new HttpException(400, "User already exists"));
+      } else {
+        const hashedPassword = await bcrypt.hash(userData.password, 10);
+        const user = await this.user.create({
+          ...userData,
+          password: hashedPassword
+        });
+        const tokenData = this.createToken(user);
+        const userReturn: ResponseUser = {
+          user,
+          tokenData
+        };
+        response.send(userReturn);
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -63,25 +67,29 @@ export class AuthenticationController implements Controller {
     response: express.Response,
     next: express.NextFunction
   ) => {
-    const logInData: LogInDto = request.body;
-    const user = await this.user.findOne({ username: logInData.username });
-    if (user) {
-      const isPasswordMatching = await bcrypt.compare(
-        logInData.password,
-        user.password
-      );
-      if (isPasswordMatching) {
-        const tokenData = this.createToken(user);
-        const userObject: ResponseUser = {
-          user,
-          tokenData
-        };
-        response.json(userObject);
+    try {
+      const logInData: LogInDto = request.body;
+      const user = await this.user.findOne({ username: logInData.username });
+      if (user) {
+        const isPasswordMatching = await bcrypt.compare(
+          logInData.password,
+          user.password
+        );
+        if (isPasswordMatching) {
+          const tokenData = this.createToken(user);
+          const userObject: ResponseUser = {
+            user,
+            tokenData
+          };
+          response.json(userObject);
+        } else {
+          next(new HttpException(403, "Forbidden"));
+        }
       } else {
-        next(new HttpException(403, "Forbidden"));
+        next(new NotFoundException("Not found"));
       }
-    } else {
-      next(new NotFoundException("Not found"));
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 

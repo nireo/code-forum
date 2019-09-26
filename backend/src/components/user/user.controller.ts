@@ -39,11 +39,15 @@ export class UserController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const users = await this.user.find({});
-    if (users) {
-      response.send(users);
-    } else {
-      next(new NotFoundException("No users have been found"));
+    try {
+      const users = await this.user.find({});
+      if (users) {
+        response.send(users);
+      } else {
+        next(new NotFoundException("No users have been found"));
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -52,13 +56,17 @@ export class UserController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const user = await this.user.findById(request.params.id);
-    if (user) {
-      response.json(user);
-    } else {
-      next(
-        new NotFoundException(`User with id ${request.params.id} not found`)
-      );
+    try {
+      const user = await this.user.findById(request.params.id);
+      if (user) {
+        response.json(user);
+      } else {
+        next(
+          new NotFoundException(`User with id ${request.params.id} not found`)
+        );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -67,20 +75,27 @@ export class UserController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = this.getToken(request);
-    if (token) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      if (decodedToken) {
-        const userData: User = request.body;
-        const user = await this.user.findByIdAndUpdate(
-          decodedToken._id,
-          userData,
-          { new: true }
-        );
-        response.json(user);
-      } else {
-        next(new HttpException(401, "Invalid token"));
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          const userData: User = request.body;
+          const user = await this.user.findByIdAndUpdate(
+            decodedToken._id,
+            userData,
+            { new: true }
+          );
+          response.json(user);
+        } else {
+          next(new HttpException(401, "Invalid token"));
+        }
       }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -89,19 +104,26 @@ export class UserController implements Controller {
     response: Response,
     next: express.NextFunction
   ): void => {
-    const token = this.getToken(request);
-    if (token) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      if (decodedToken) {
-        this.user.findByIdAndDelete(decodedToken._id).then(success => {
-          if (success) {
-            response.status(204);
-          } else {
-            // post not found
-            next(new HttpException(404, "User not found"));
-          }
-        });
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          this.user.findByIdAndDelete(decodedToken._id).then(success => {
+            if (success) {
+              response.status(204);
+            } else {
+              // post not found
+              next(new HttpException(404, "User not found"));
+            }
+          });
+        }
       }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 }

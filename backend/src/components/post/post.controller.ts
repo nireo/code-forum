@@ -37,9 +37,17 @@ export class PostController implements Controller {
     );
   }
 
-  private getAllPosts = async (request: Request, response: Response) => {
-    const posts = await this.post.find().populate("byUser");
-    response.json(posts);
+  private getAllPosts = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const posts = await this.post.find().populate("byUser");
+      response.json(posts);
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
   };
 
   private getPostById = async (
@@ -47,11 +55,15 @@ export class PostController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const post = this.post.findById(request.params.id);
-    if (post) {
-      response.json(post);
-    } else {
-      next(new HttpException(404, "Post not found"));
+    try {
+      const post = this.post.findById(request.params.id);
+      if (post) {
+        response.json(post);
+      } else {
+        next(new HttpException(404, "Post not found"));
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -68,22 +80,29 @@ export class PostController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const data: CreatePostDto = request.body;
-    const token: string | null = this.getToken(request);
-    if (token && data) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      const user = await this.user.findById(decodedToken._id);
-      if (user) {
-        const newPost = new this.post({
-          ...data,
-          byUser: user._id
-        });
-        const saved = await newPost.save();
-        await saved.populate("byUser").execPopulate();
-        response.json(saved);
-      } else {
-        next(new HttpException(403, "Forbidden"));
+    try {
+      const data: CreatePostDto = request.body;
+      const token: string | null = this.getToken(request);
+      if (token && data) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        const user = await this.user.findById(decodedToken._id);
+        if (user) {
+          const newPost = new this.post({
+            ...data,
+            byUser: user._id
+          });
+          const saved = await newPost.save();
+          await saved.populate("byUser").execPopulate();
+          response.json(saved);
+        } else {
+          next(new HttpException(403, "Forbidden"));
+        }
       }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -103,24 +122,31 @@ export class PostController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = this.getToken(request);
-    if (token) {
-      const id = request.params.id;
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      const user = await this.user.findById(decodedToken._id);
-      if (user) {
-        if (this.checkForUserOwnership(user.posts, id)) {
-          const success = await this.post.findByIdAndRemove(id);
-          if (success) {
-            response.send(204).end();
-          } else {
-            next(new NotFoundException("Post was not found"));
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const id = request.params.id;
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        const user = await this.user.findById(decodedToken._id);
+        if (user) {
+          if (this.checkForUserOwnership(user.posts, id)) {
+            const success = await this.post.findByIdAndRemove(id);
+            if (success) {
+              response.send(204).end();
+            } else {
+              next(new NotFoundException("Post was not found"));
+            }
           }
+          next(new HttpException(403, "Forbidden"));
         }
-        next(new HttpException(403, "Forbidden"));
+      } else {
+        next(new HttpException(401, "Invalid token"));
       }
-    } else {
-      next(new HttpException(401, "Invalid token"));
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -129,33 +155,40 @@ export class PostController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const token = this.getToken(request);
-    const id: string = request.params.id;
-    if (token) {
-      const decodedToken = jwt.verify(token, "EnvSecret") as DataStoredInToken;
-      const user = await this.user.findById(decodedToken._id);
-      if (user) {
-        if (this.checkForUserOwnership(user.posts, id)) {
-          const newData: UpdatePostDto = request.body;
-          const newPost = this.post.findByIdAndUpdate(id, newData, {
-            new: true
-          });
-          if (newPost) {
-            response.json(newPost);
+    try {
+      const token = this.getToken(request);
+      const id: string = request.params.id;
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        const user = await this.user.findById(decodedToken._id);
+        if (user) {
+          if (this.checkForUserOwnership(user.posts, id)) {
+            const newData: UpdatePostDto = request.body;
+            const newPost = this.post.findByIdAndUpdate(id, newData, {
+              new: true
+            });
+            if (newPost) {
+              response.json(newPost);
+            } else {
+              // this is since most of the time 'findByIdAndUpdate' only returns
+              // one type of error when the post has not been found.
+              next(new NotFoundException("Post has not been found"));
+            }
+            next(new HttpException(403, "Forbidden"));
           } else {
-            // this is since most of the time 'findByIdAndUpdate' only returns
-            // one type of error when the post has not been found.
-            next(new NotFoundException("Post has not been found"));
+            next(new HttpException(403, "Forbidden"));
           }
-          next(new HttpException(403, "Forbidden"));
         } else {
           next(new HttpException(403, "Forbidden"));
         }
       } else {
-        next(new HttpException(403, "Forbidden"));
+        next(new HttpException(401, "Invalid token"));
       }
-    } else {
-      next(new HttpException(401, "Invalid token"));
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 
@@ -164,18 +197,22 @@ export class PostController implements Controller {
     response: Response,
     next: NextFunction
   ): Promise<void> => {
-    const results = await this.post.find({});
-    const filteredResults = results.filter(
-      r => r.category === request.params.category
-    );
-    if (filteredResults.length >= 1) {
-      response.json(filteredResults);
-    } else {
-      next(
-        new NotFoundException(
-          `Posts in category ${request.params.category} have not been found`
-        )
+    try {
+      const results = await this.post.find({});
+      const filteredResults = results.filter(
+        r => r.category === request.params.category
       );
+      if (filteredResults.length >= 1) {
+        response.json(filteredResults);
+      } else {
+        next(
+          new NotFoundException(
+            `Posts in category ${request.params.category} have not been found`
+          )
+        );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
     }
   };
 }

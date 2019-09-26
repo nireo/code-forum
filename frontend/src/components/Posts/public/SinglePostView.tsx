@@ -37,11 +37,10 @@ const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   useEffect(() => {
     if (post === undefined) {
-      const checkPost = posts.find(p => p._id === id);
-      if (checkPost === undefined) {
+      if (!posts.find(p => p._id === id)) {
         getSinglePost(id);
       } else {
-        setPost(checkPost);
+        setPost(posts.find(p => p._id === id));
       }
     }
   }, [id, getSinglePost, setPost, post]);
