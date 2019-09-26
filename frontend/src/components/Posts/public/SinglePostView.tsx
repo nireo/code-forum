@@ -6,6 +6,15 @@ import { connect } from "react-redux";
 import { getSinglePost } from "../../../reducers/postReducer";
 import { PostInterface } from "../../../interfaces/post.interface";
 import Loading from "../../Loading";
+import { makeStyles } from "@material-ui/core/styles";
+import Markdown from "../../Markdown";
+
+const useStyles = makeStyles(theme => ({
+  markdown: {
+    ...theme.typography.body2,
+    padding: theme.spacing(3, 0)
+  }
+}));
 
 type Props = {
   id: string;
@@ -16,31 +25,37 @@ type Props = {
 const findPost = (
   posts: PostInterface[],
   id: string
-): Boolean | PostInterface => {
+): undefined | PostInterface => {
   const post = posts.find(p => p._id === id);
   if (post) {
     return post;
   }
-  return false;
+  return undefined;
 };
 
 const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
-  const [post, setPost] = useState();
-  const [notFound, setNotFound] = useState({});
+  const [post, setPost] = useState<PostInterface | undefined>(undefined);
   useEffect(() => {
-    setPost(findPost(posts, id));
+    if (post === undefined) {
+      const checkPost = posts.find(p => p._id === id);
+      if (checkPost === undefined) {
+        getSinglePost(id);
+      } else {
+        setPost(checkPost);
+      }
+    }
   }, [id, getSinglePost, setPost, post]);
   return (
     <div>
       <Container maxWidth="md">
-        {!post ? (
+        {post === undefined ? (
           <Loading />
         ) : (
           <Grid item xs={12} md={8}>
             <Typography variant="h4" gutterBottom>
               {post.title}
             </Typography>
-            <Typography variant="body2">{post.content}</Typography>
+            <Markdown>{post.content}</Markdown>
           </Grid>
         )}
       </Container>

@@ -56,7 +56,7 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
         <Route exact path="/posts" render={() => <PostMainPage />} />
         <Route
           exact
-          path="/posts/:id"
+          path="/post/:id"
           render={({ match }) => <SinglePostView id={match.params.id} />}
         />
         <Route
