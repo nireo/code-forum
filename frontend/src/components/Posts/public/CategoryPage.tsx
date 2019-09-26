@@ -16,9 +16,9 @@ const CategoryPage: React.FC<Props> = ({ category, posts }) => {
     PostInterface[] | undefined
   >(undefined);
   useEffect(() => {
-    setFilteredPosts(posts.filter(p => p.category === category));
     if (filteredPosts === undefined) {
       getPostsByCategory(category);
+      setFilteredPosts(posts.filter(p => p.category === category));
     }
   }, [category, posts, filteredPosts, setFilteredPosts]);
   return (
@@ -26,7 +26,7 @@ const CategoryPage: React.FC<Props> = ({ category, posts }) => {
       {filteredPosts === undefined ? (
         <Loading />
       ) : (
-        filteredPosts.map(p => <Post post={p} />)
+        filteredPosts.map(p => <Post key={p._id} post={p} />)
       )}
     </Container>
   );

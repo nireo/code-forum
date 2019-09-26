@@ -5,6 +5,7 @@ import Card from "@material-ui/core/Card";
 import Typography from "@material-ui/core/Typography";
 import { PostInterface } from "../../interfaces/post.interface";
 import CardContent from "@material-ui/core/CardContent";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   post: {
@@ -42,7 +43,7 @@ const Post: React.FC<Props> = ({ post }) => {
   const classes = useStyles();
   return (
     <div style={{ marginTop: "0.5rem" }}>
-      <CardActionArea>
+      <Link style={{ textDecoration: "none" }} to={`/post/${post._id}`}>
         <Card className={classes.card}>
           <div className={classes.cardDetails}>
             <CardContent>
@@ -60,7 +61,7 @@ const Post: React.FC<Props> = ({ post }) => {
             </CardContent>
           </div>
         </Card>
-      </CardActionArea>
+      </Link>
     </div>
   );
 };
