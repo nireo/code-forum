@@ -2,10 +2,10 @@ import axios from "axios";
 import { CreatePostInterface } from "../interfaces/post.interface";
 const baseUrl = "/api/post";
 
-let token: string = "";
+let token = "";
 
-const setToken = (token: string): void => {
-  token = `bearer ${token}`;
+const setToken = (newToken: string) => {
+  token = `bearer ${newToken}`;
 };
 
 const getConfig = () => ({

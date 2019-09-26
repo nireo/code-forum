@@ -49,8 +49,11 @@ const NavBar: React.FC<Props> = ({ user }) => {
           noWrap
           className={classes.toolbarTitle}
         >
-          code forum <Code />
+          <Link to="/" style={{ color: "black", textDecoration: "none" }}>
+            code forum <Code />
+          </Link>
         </Typography>
+
         <nav>
           <Link style={linkStyle} to="/posts" className={classes.link}>
             posts

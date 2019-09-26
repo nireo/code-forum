@@ -9,6 +9,10 @@ import Copyright from "../../Copyright";
 import { connect } from "react-redux";
 import { CreatePost } from "../../../reducers/postReducer";
 import { CreatePostInterface } from "../../../interfaces/post.interface";
+import Select from "@material-ui/core/Select";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import { MenuItem } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -49,6 +53,10 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
     width: "100%"
+  },
+  formControl: {
+    margin: theme.spacing(1),
+    minWidth: 150
   }
 }));
 
@@ -59,6 +67,9 @@ type Props = {
 const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [categories, setCategories] = useState({
+    category: ""
+  });
   const classes = useStyles();
 
   const handlePostCreation = async (
@@ -72,6 +83,15 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
       };
       await CreatePost(newPost);
     }
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<{ name?: string; value: unknown }>
+  ) => {
+    setCategories(old => ({
+      ...old,
+      [event.target.name as string]: event.target.value
+    }));
   };
 
   return (
@@ -109,6 +129,23 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
               value={content}
               onChange={({ target }) => setContent(target.value)}
             />
+            <FormControl className={classes.formControl}>
+              <InputLabel htmlFor="category-select">Category</InputLabel>
+              <Select
+                value={categories.category}
+                onChange={handleChange}
+                inputProps={{
+                  name: "category",
+                  id: "category-select"
+                }}
+              >
+                <MenuItem value={"python"}>Python</MenuItem>
+                <MenuItem value={"js"}>Javascript</MenuItem>
+                <MenuItem value={"competetive"}>Competetive</MenuItem>
+                <MenuItem value={"books"}>Books</MenuItem>
+                <MenuItem value={"random"}>Random</MenuItem>
+              </Select>
+            </FormControl>
             <Button
               type="submit"
               variant="contained"
