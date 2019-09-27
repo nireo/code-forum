@@ -73,7 +73,7 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
             <CategoryPage category={match.params.category} />
           )}
         />
-        />
+        <Route exact path="/users/:id" />
       </Switch>
     </Router>
   );

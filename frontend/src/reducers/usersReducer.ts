@@ -1,7 +1,8 @@
 import { Dispatch } from "redux";
 import userService from "../services/users";
+import { User } from "../interfaces/user.interface";
 
-const reducer = (state: Array<object> = [], action: any) => {
+const reducer = (state: User[] = [], action: any) => {
   switch (action.type) {
     case "INIT_SINGLE":
       if (state === []) {
