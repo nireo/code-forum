@@ -8,11 +8,17 @@ import { PostInterface } from "../../../interfaces/post.interface";
 import Loading from "../../Loading";
 import { makeStyles } from "@material-ui/core/styles";
 import Markdown from "../../Markdown";
+import TextField from "@material-ui/core/TextField";
+import Button from "@material-ui/core/Button";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
     ...theme.typography.body2,
     padding: theme.spacing(3, 0)
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+    width: "100%"
   }
 }));
 
@@ -35,6 +41,8 @@ const findPost = (
 
 const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
+  const [comment, setComment] = useState<string>("");
+  const classes = useStyles();
   useEffect(() => {
     if (post === undefined) {
       if (!posts.find(p => p._id === id)) {
@@ -46,18 +54,51 @@ const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
   }, [id, getSinglePost, setPost, post]);
   return (
     <div>
-      <Container maxWidth="md">
-        {post === undefined ? (
-          <Loading />
-        ) : (
-          <Grid item xs={12} md={8}>
-            <Typography variant="h4" gutterBottom>
-              {post.title}
-            </Typography>
-            <Markdown>{post.content}</Markdown>
-          </Grid>
-        )}
-      </Container>
+      {post === undefined ? (
+        <Loading />
+      ) : (
+        <div>
+          <Container maxWidth="md">
+            <Grid item xs={12} md={8}>
+              <Typography variant="h4" gutterBottom>
+                {post.title}
+              </Typography>
+              <Markdown>{post.content}</Markdown>
+            </Grid>
+          </Container>
+
+          <Container maxWidth="md">
+            <form>
+              <TextField
+                label="Comment"
+                multiline
+                rows="8"
+                margin="normal"
+                variant="filled"
+                id="outlined-multiline-flexible"
+                style={{
+                  width: "100%"
+                }}
+                value={comment}
+                onChange={({ target }) => setComment(target.value)}
+              />
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                className={classes.submit}
+              >
+                Submit comment
+              </Button>
+              <Typography variant="body2">
+                Note: the content and comments work with markdown try it out!
+              </Typography>
+            </form>
+            <Typography variant="h5">Preview of comment</Typography>
+            <Markdown>{comment}</Markdown>
+          </Container>
+        </div>
+      )}
     </div>
   );
 };

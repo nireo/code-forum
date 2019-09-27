@@ -92,10 +92,8 @@ export class CommentController implements Controller {
                 toPost: post._id
               });
               const savedComment = await newPost.save();
-              user.comments = user.comments.concat(savedComment._id);
               post.comments = post.comments.concat(savedComment._id);
               const saved = await post.save();
-              await user.save();
               response.json(saved);
             } else {
               next(new HttpException(403, "Forbidden"));

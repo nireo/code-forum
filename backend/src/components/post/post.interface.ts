@@ -4,7 +4,7 @@ interface Post {
   likes: number;
   dislikes: number;
   byUser: string;
-  comments: Comment[];
+  comments: string[];
   category: string;
 }
 

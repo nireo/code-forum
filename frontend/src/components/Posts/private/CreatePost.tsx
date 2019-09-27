@@ -12,7 +12,8 @@ import { CreatePostInterface } from "../../../interfaces/post.interface";
 import Select from "@material-ui/core/Select";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
-import { MenuItem } from "@material-ui/core";
+import { MenuItem, Container } from "@material-ui/core";
+import Markdown from "../../Markdown";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -96,7 +97,7 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   return (
     <div>
       <CssBaseline />
-      <main className={classes.layout}>
+      <Container maxWidth="md">
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
             Create post
@@ -118,15 +119,15 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
               onChange={({ target }) => setTitle(target.value)}
             />
             <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
               label="Content"
-              autoFocus
-              autoComplete="content"
-              value={content}
+              multiline
+              rows="8"
+              margin="normal"
+              variant="filled"
+              id="outlined-multiline-flexible"
+              style={{ width: "100%" }}
               onChange={({ target }) => setContent(target.value)}
+              value={content}
             />
             <FormControl className={classes.formControl}>
               <InputLabel htmlFor="category-select">Category</InputLabel>
@@ -153,10 +154,15 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
             >
               Create post
             </Button>
+            <Typography variant="body2">
+              Note: the content and comments work with markdown try it out!
+            </Typography>
           </form>
+          <Typography variant="h5">Preview of content</Typography>
+          <Markdown>{content}</Markdown>
         </Paper>
         <Copyright />
-      </main>
+      </Container>
     </div>
   );
 };
