@@ -18,6 +18,7 @@ import SinglePostView from "./components/Posts/public/SinglePostView";
 import NavBar from "./components/layout/NavBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import CategoryPage from "./components/Posts/public/CategoryPage";
+import SingleUserPage from "./components/Users/public/SingleUserPage";
 
 type Props = {
   user?: object;
@@ -73,7 +74,11 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
             <CategoryPage category={match.params.category} />
           )}
         />
-        <Route exact path="/users/:id" />
+        <Route
+          exact
+          path="/users/:id"
+          render={({ match }) => <SingleUserPage id={match.params.id} />}
+        />
       </Switch>
     </Router>
   );

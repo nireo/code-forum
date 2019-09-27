@@ -40,7 +40,7 @@ export class UserController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const users = await this.user.find({});
+      const users = await this.user.find({}).populate("posts");
       if (users) {
         response.send(users);
       } else {

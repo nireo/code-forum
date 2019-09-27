@@ -3,7 +3,10 @@ import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { connect } from "react-redux";
-import { getSinglePost } from "../../../reducers/postReducer";
+import {
+  getSinglePost,
+  getCommentsInPost
+} from "../../../reducers/postReducer";
 import { PostInterface } from "../../../interfaces/post.interface";
 import Loading from "../../Loading";
 import { makeStyles } from "@material-ui/core/styles";
@@ -26,6 +29,7 @@ type Props = {
   id: string;
   posts: PostInterface[];
   getSinglePost: (id: string) => void;
+  getCommentsInPost: (id: string) => void;
 };
 
 const findPost = (
@@ -39,7 +43,12 @@ const findPost = (
   return undefined;
 };
 
-const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
+const SinglePostView: React.FC<Props> = ({
+  posts,
+  id,
+  getSinglePost,
+  getCommentsInPost
+}) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
   const classes = useStyles();
@@ -49,6 +58,19 @@ const SinglePostView: React.FC<Props> = ({ posts, id, getSinglePost }) => {
         getSinglePost(id);
       } else {
         setPost(posts.find(p => p._id === id));
+      }
+      const checkPostType = (
+        post: PostInterface | undefined
+      ): post is PostInterface => {
+        if (post as PostInterface) {
+          return true;
+        }
+        return false;
+      };
+      if (checkPostType(post)) {
+        if (post.comments === []) {
+          getCommentsInPost(post._id);
+        }
       }
     }
   }, [id, getSinglePost, setPost, post]);
@@ -111,5 +133,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { getSinglePost }
+  { getSinglePost, getCommentsInPost }
 )(SinglePostView);
