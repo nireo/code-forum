@@ -3,7 +3,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import Copyright from "./Copyright";
+import Footer from "./Footer";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -14,11 +14,6 @@ const useStyles = makeStyles(theme => ({
   main: {
     marginTop: theme.spacing(8),
     marginBottom: theme.spacing(2)
-  },
-  footer: {
-    padding: theme.spacing(2),
-    marginTop: "auto",
-    backgroundColor: "white"
   }
 }));
 
@@ -48,11 +43,7 @@ const Main: React.FC = () => {
           languages.
         </Typography>
       </Container>
-      <footer className={classes.footer}>
-        <Container maxWidth="sm">
-          <Copyright />
-        </Container>
-      </footer>
+      <Footer />
     </div>
   );
 };

@@ -79,11 +79,9 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    user: state.user
-  };
-};
+const mapStateToProps = (state: any) => ({
+  user: state.user
+});
 
 export default connect(
   mapStateToProps,
