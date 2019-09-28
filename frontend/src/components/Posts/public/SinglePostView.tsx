@@ -144,11 +144,9 @@ const SinglePostView: React.FC<Props> = ({
   );
 };
 
-const mapStateToProps = (state: any) => {
-  return {
-    posts: state.posts
-  };
-};
+const mapStateToProps = (state: any) => ({
+  posts: state.posts
+});
 
 export default connect(
   mapStateToProps,

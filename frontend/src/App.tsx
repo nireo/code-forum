@@ -19,9 +19,12 @@ import NavBar from "./components/layout/NavBar";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import CategoryPage from "./components/Posts/public/CategoryPage";
 import SingleUserPage from "./components/Users/public/SingleUserPage";
+import Settings from "./components/Users/private/Settings";
+import { User } from "./interfaces/user.interface";
+import NotFound from "./components/NotFound";
 
 type Props = {
-  user?: object;
+  user?: User;
   checkLocalStorage: () => Promise<void>;
 };
 
@@ -79,6 +82,12 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
           path="/users/:id"
           render={({ match }) => <SingleUserPage id={match.params.id} />}
         />
+        <Route
+          exact
+          path="/settings"
+          render={() => (user ? <Settings /> : <Redirect to="/" />)}
+        />
+        <Route render={() => <NotFound />} />
       </Switch>
     </Router>
   );
