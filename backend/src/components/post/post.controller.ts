@@ -56,12 +56,10 @@ export class PostController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const post = this.post.findById(request.params.id);
-      if (post) {
-        response.json(post);
-      } else {
-        next(new HttpException(404, "Post not found"));
-      }
+      const post = await this.post
+        .findById(request.params.id)
+        .populate("byUser");
+      response.json(post);
     } catch (e) {
       next(new HttpException(500, e.message));
     }

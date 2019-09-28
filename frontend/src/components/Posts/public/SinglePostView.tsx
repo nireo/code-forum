@@ -58,26 +58,20 @@ const SinglePostView: React.FC<Props> = ({
   const [commentsLoaded, setCommentsLoaded] = useState<Boolean>(false);
   const classes = useStyles();
   useEffect(() => {
+    if (posts === []) {
+      getSinglePost(id);
+    }
     if (post === undefined) {
       if (!posts.find(p => p._id === id)) {
         getSinglePost(id);
       } else {
         setPost(posts.find(p => p._id === id));
       }
-      const checkPostType = (
-        post: PostInterface | undefined
-      ): post is PostInterface => {
-        if (post as PostInterface) {
-          return true;
-        }
-        return false;
-      };
-      // just checking the type so that we don't get comments for undefined
-      if (checkPostType(post)) {
-        if (commentsLoaded === false) {
-          getCommentsInPost(id);
-          setCommentsLoaded(true);
-        }
+    }
+    if (post) {
+      if (commentsLoaded === false) {
+        getCommentsInPost(id);
+        setCommentsLoaded(true);
       }
     }
   }, [id, getSinglePost, setPost, post]);
@@ -85,6 +79,7 @@ const SinglePostView: React.FC<Props> = ({
   const createComment = async (
     event: FormEvent<HTMLFormElement>
   ): Promise<void> => {
+    event.preventDefault();
     if (comment) {
       const commentObject: CreateComment = {
         content: comment
@@ -107,7 +102,8 @@ const SinglePostView: React.FC<Props> = ({
               <Markdown>{post.content}</Markdown>
             </Grid>
           </Container>
-
+          {post.comments !== undefined &&
+            post.comments.map(c => <Markdown>{c.content}</Markdown>)}
           <Container maxWidth="md">
             <form onSubmit={createComment}>
               <TextField
