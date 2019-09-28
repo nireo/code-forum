@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, FormEvent } from "react";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { connect } from "react-redux";
 import {
   getSinglePost,
-  getCommentsInPost
+  getCommentsInPost,
+  addNewComment
 } from "../../../reducers/postReducer";
 import { PostInterface } from "../../../interfaces/post.interface";
 import Loading from "../../Loading";
@@ -13,6 +14,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Markdown from "../../Markdown";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
+import { CreateComment } from "../../../interfaces/comment.interface";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
@@ -30,6 +32,7 @@ type Props = {
   posts: PostInterface[];
   getSinglePost: (id: string) => void;
   getCommentsInPost: (id: string) => void;
+  addNewComment: (id: string, newComment: CreateComment) => Promise<void>;
 };
 
 const findPost = (
@@ -47,10 +50,12 @@ const SinglePostView: React.FC<Props> = ({
   posts,
   id,
   getSinglePost,
-  getCommentsInPost
+  getCommentsInPost,
+  addNewComment
 }) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
+  const [commentsLoaded, setCommentsLoaded] = useState<Boolean>(false);
   const classes = useStyles();
   useEffect(() => {
     if (post === undefined) {
@@ -67,13 +72,27 @@ const SinglePostView: React.FC<Props> = ({
         }
         return false;
       };
+      // just checking the type so that we don't get comments for undefined
       if (checkPostType(post)) {
-        if (post.comments === []) {
-          getCommentsInPost(post._id);
+        if (commentsLoaded === false) {
+          getCommentsInPost(id);
+          setCommentsLoaded(true);
         }
       }
     }
   }, [id, getSinglePost, setPost, post]);
+
+  const createComment = async (
+    event: FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    if (comment) {
+      const commentObject: CreateComment = {
+        content: comment
+      };
+      await addNewComment(id, commentObject);
+    }
+  };
+
   return (
     <div>
       {post === undefined ? (
@@ -90,7 +109,7 @@ const SinglePostView: React.FC<Props> = ({
           </Container>
 
           <Container maxWidth="md">
-            <form>
+            <form onSubmit={createComment}>
               <TextField
                 label="Comment"
                 multiline
@@ -133,5 +152,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { getSinglePost, getCommentsInPost }
+  { getSinglePost, getCommentsInPost, addNewComment }
 )(SinglePostView);

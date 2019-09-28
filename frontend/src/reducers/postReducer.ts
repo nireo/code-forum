@@ -5,6 +5,7 @@ import {
   CreatePostInterface,
   PostInterface
 } from "../interfaces/post.interface";
+import { CreateComment } from "../interfaces/comment.interface";
 
 const reducer = (state: PostInterface[] = [], action: any) => {
   switch (action.type) {
@@ -30,6 +31,12 @@ const reducer = (state: PostInterface[] = [], action: any) => {
       }
       // refresh the posts
       return state.map(p => (p._id === action.id ? post : p));
+    case "NEW_COMMENT":
+      const postToComment = state.find(p => p._id === action.id);
+      if (postToComment) {
+        postToComment.comments = postToComment.comments.concat(action.data);
+      }
+      return state.map(p => (p._id === action.id ? postToComment : p));
     default:
       return state;
   }
@@ -81,6 +88,17 @@ export const getCommentsInPost = (id: string) => {
     dispatch({
       type: "ADD_COMMENTS_TO_POST",
       data: comments,
+      id: id
+    });
+  };
+};
+
+export const addNewComment = (id: string, newComment: CreateComment) => {
+  return async (dispatch: Dispatch) => {
+    const comment = await commentService.createComment(id, newComment);
+    dispatch({
+      type: "NEW_COMMENT",
+      data: comment,
       id: id
     });
   };

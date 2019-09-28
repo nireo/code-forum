@@ -1,4 +1,5 @@
 import axios from "axios";
+import { CreateComment } from "../interfaces/comment.interface";
 const baseUrl = "/api/comment";
 
 let token: string = "";
@@ -16,8 +17,12 @@ const getCommentsInPost = async (id: string) => {
   return response.data;
 };
 
-const createComment = async (newComment: Comment) => {
-  const response = await axios.post(`${baseUrl}`, newComment, getConfig());
+const createComment = async (id: string, newComment: CreateComment) => {
+  const response = await axios.post(
+    `${baseUrl}/${id}`,
+    newComment,
+    getConfig()
+  );
   return response.data;
 };
 

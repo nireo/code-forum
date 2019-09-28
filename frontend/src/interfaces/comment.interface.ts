@@ -5,4 +5,8 @@ interface Comment {
   byUser: User;
 }
 
+export interface CreateComment {
+  content: string;
+}
+
 export default Comment;
