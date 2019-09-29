@@ -22,14 +22,12 @@ const postScheme: mongoose.Schema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  comments: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Comment"
-  },
-  posts: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Posts"
-  },
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }
+  ],
   category: {
     type: String,
     required: true

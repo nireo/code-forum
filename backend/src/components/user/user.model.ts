@@ -14,14 +14,18 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
     type: String,
     required: true
   },
-  posts: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Post"
-  },
-  comments: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Comment"
-  }
+  posts: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Post"
+    }
+  ],
+  comments: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Comment"
+    }
+  ]
 });
 
 userSchema.set("toJSON", {

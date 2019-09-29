@@ -12,6 +12,7 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
 import userModel from "../user/user.model";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
+import { isUserWhitespacable } from "@babel/types";
 
 export class CommentController implements Controller {
   public path: string = "/api/comment";
@@ -88,20 +89,28 @@ export class CommentController implements Controller {
             if (user) {
               const newPost = new this.comment({
                 ...data,
-                byUser: user._id,
-                toPost: post._id
+                byUser: user._id
               });
               const newComment = await newPost.save();
-              response.json(newComment);
+              user.comments = [...user.comments, newComment._id];
+              post.comments = [...post.comments, newComment._id];
+              await user.save();
+              await post.save((err: any, post: any) => {
+                if (err) next(new HttpException(500, err.message));
+                post
+                  .populate("comments")
+                  .execPopulate()
+                  .then((populatedPost: any) => response.json(populatedPost));
+              });
             } else {
               next(new HttpException(403, "Forbidden"));
             }
           } else {
             next(new NotFoundException("Post not found"));
           }
+        } else {
           next(new HttpException(403, "Forbidden"));
         }
-        next(new HttpException(403, "Forbidden"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));
