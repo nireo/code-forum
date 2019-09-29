@@ -25,12 +25,7 @@ const reducer = (state: PostInterface[] = [], action: any) => {
       });
       return copyState;
     case "ADD_COMMENTS":
-      const post = state.find(p => p._id === action.id);
-      if (post) {
-        post.comments = action.data;
-      }
-      // refresh the posts
-      return state.map(p => (p._id === action.id ? post : p));
+      return state.map(p => (p._id === action.id ? action.data : p));
     case "NEW_COMMENT":
       const postToComment = state.find(p => p._id === action.id);
       if (postToComment) {

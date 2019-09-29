@@ -15,6 +15,7 @@ import Markdown from "../../Markdown";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { CreateComment } from "../../../interfaces/comment.interface";
+import { Divider } from "@material-ui/core";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
@@ -102,8 +103,15 @@ const SinglePostView: React.FC<Props> = ({
               <Markdown>{post.content}</Markdown>
             </Grid>
           </Container>
-          {post.comments !== undefined &&
-            post.comments.map(c => <Markdown>{c.content}</Markdown>)}
+          <Container maxWidth="md">
+            <Divider />
+            {post.comments.map(c => (
+              <div>
+                <Markdown>{c.content}</Markdown>
+                <Divider />
+              </div>
+            ))}
+          </Container>
           <Container maxWidth="md">
             <form onSubmit={createComment}>
               <TextField

@@ -56,11 +56,11 @@ export class CommentController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const comments = await this.comment
-        .find({ toPost: request.params.id })
-        .populate("byUser");
-      if (comments) {
-        response.json(comments);
+      const post = await this.post
+        .findById(request.params.id)
+        .populate("comments");
+      if (post) {
+        response.json(post);
       } else {
         next(new HttpException(404, "No comments found for post"));
       }

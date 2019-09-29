@@ -43,7 +43,10 @@ export class PostController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const posts = await this.post.find().populate("byUser");
+      const posts = await this.post
+        .find()
+        .populate("byUser")
+        .populate("comments");
       response.json(posts);
     } catch (e) {
       next(new HttpException(500, e.message));
