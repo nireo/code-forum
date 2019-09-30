@@ -26,9 +26,6 @@ export class CommentController implements Controller {
   }
 
   public initRoutes() {
-    // comments won't get a 'get all method' since there isn't any point
-    // in initializing all the comments on the whole website
-    this.router.get(`${this.path}/:id`, this.getCommentsInPost);
     this.router.post(
       `${this.path}/:id`,
       validationMiddleware(CreateCommentDto),
@@ -48,25 +45,6 @@ export class CommentController implements Controller {
       return authorization.substring(7);
     }
     return null;
-  };
-
-  private getCommentsInPost = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const post = await this.post
-        .findById(request.params.id)
-        .populate("comments");
-      if (post) {
-        response.json(post);
-      } else {
-        next(new HttpException(404, "No comments found for post"));
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
-    }
   };
 
   private createComment = async (

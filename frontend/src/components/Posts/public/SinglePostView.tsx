@@ -3,11 +3,7 @@ import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import { connect } from "react-redux";
-import {
-  getSinglePost,
-  getCommentsInPost,
-  addNewComment
-} from "../../../reducers/postReducer";
+import { getSinglePost, addNewComment } from "../../../reducers/postReducer";
 import { PostInterface } from "../../../interfaces/post.interface";
 import Loading from "../../Loading";
 import { makeStyles } from "@material-ui/core/styles";
@@ -16,6 +12,7 @@ import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { CreateComment } from "../../../interfaces/comment.interface";
 import { Divider } from "@material-ui/core";
+import { Link } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
@@ -25,6 +22,10 @@ const useStyles = makeStyles(theme => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
     width: "100%"
+  },
+  markdownClass: {
+    ...theme.typography.body2,
+    padding: theme.spacing(3, 0)
   }
 }));
 
@@ -32,7 +33,6 @@ type Props = {
   id: string;
   posts: PostInterface[];
   getSinglePost: (id: string) => void;
-  getCommentsInPost: (id: string) => void;
   addNewComment: (id: string, newComment: CreateComment) => Promise<void>;
 };
 
@@ -51,7 +51,6 @@ const SinglePostView: React.FC<Props> = ({
   posts,
   id,
   getSinglePost,
-  getCommentsInPost,
   addNewComment
 }) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
@@ -67,12 +66,6 @@ const SinglePostView: React.FC<Props> = ({
         getSinglePost(id);
       } else {
         setPost(posts.find(p => p._id === id));
-      }
-    }
-    if (post) {
-      if (commentsLoaded === false) {
-        getCommentsInPost(id);
-        setCommentsLoaded(true);
       }
     }
   }, [id, getSinglePost, setPost, post]);
@@ -100,14 +93,20 @@ const SinglePostView: React.FC<Props> = ({
               <Typography variant="h4" gutterBottom>
                 {post.title}
               </Typography>
-              <Markdown>{post.content}</Markdown>
+              <Markdown className={classes.markdownClass}>
+                {post.content}
+              </Markdown>
             </Grid>
           </Container>
           <Container maxWidth="md">
             <Divider />
             {post.comments.map(c => (
               <div>
-                <Markdown>{c.content}</Markdown>
+                Posted by{" "}
+                <Link to={`/user/${c.byUser._id}`}>@{c.byUser.username}</Link>
+                <Markdown className={classes.markdownClass}>
+                  {c.content}
+                </Markdown>
                 <Divider />
               </div>
             ))}
@@ -140,7 +139,7 @@ const SinglePostView: React.FC<Props> = ({
               </Typography>
             </form>
             <Typography variant="h5">Preview of comment</Typography>
-            <Markdown>{comment}</Markdown>
+            <Markdown className={classes.markdownClass}>{comment}</Markdown>
           </Container>
         </div>
       )}
@@ -154,5 +153,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { getSinglePost, getCommentsInPost, addNewComment }
+  { getSinglePost, addNewComment }
 )(SinglePostView);

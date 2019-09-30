@@ -12,11 +12,6 @@ const getConfig = () => ({
   headers: { Authorization: token }
 });
 
-const getCommentsInPost = async (id: string) => {
-  const response = await axios.get(`${baseUrl}/${id}`);
-  return response.data;
-};
-
 const createComment = async (id: string, newComment: CreateComment) => {
   const response = await axios.post(
     `${baseUrl}/${id}`,
@@ -38,7 +33,6 @@ const updateComment = async (updated: Comment, id: string) => {
 
 export default {
   createComment,
-  getCommentsInPost,
   deleteComment,
   updateComment,
   setToken

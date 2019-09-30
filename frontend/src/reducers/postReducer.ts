@@ -77,17 +77,6 @@ export const getPostsByCategory = (category: string) => {
   };
 };
 
-export const getCommentsInPost = (id: string) => {
-  return async (dispatch: Dispatch) => {
-    const comments = await commentService.getCommentsInPost(id);
-    dispatch({
-      type: "ADD_COMMENTS_TO_POST",
-      data: comments,
-      id: id
-    });
-  };
-};
-
 export const addNewComment = (id: string, newComment: CreateComment) => {
   return async (dispatch: Dispatch) => {
     const comment = await commentService.createComment(id, newComment);
