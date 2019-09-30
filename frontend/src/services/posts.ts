@@ -37,11 +37,17 @@ const getPostsFromCategory = async (category: string) => {
   return response.data;
 };
 
+const getPostsFromUser = async (userId: string) => {
+  const response = await axios.get(`${baseUrl}/user/${userId}`);
+  return response.data;
+};
+
 export default {
   deletePost,
   getPostById,
   getPosts,
   createPost,
   setToken,
-  getPostsFromCategory
+  getPostsFromCategory,
+  getPostsFromUser
 };

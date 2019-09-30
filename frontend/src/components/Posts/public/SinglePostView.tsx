@@ -89,7 +89,7 @@ const SinglePostView: React.FC<Props> = ({
       ) : (
         <div>
           <Container maxWidth="md">
-            <Grid item xs={12} md={8}>
+            <Grid item xs={12} md={8} style={{ paddingBottom: "2rem" }}>
               <Typography variant="h4" gutterBottom>
                 {post.title}
               </Typography>
@@ -103,7 +103,12 @@ const SinglePostView: React.FC<Props> = ({
             {post.comments.map(c => (
               <div>
                 Posted by{" "}
-                <Link to={`/user/${c.byUser._id}`}>@{c.byUser.username}</Link>
+                <Link
+                  style={{ textDecoration: "none" }}
+                  to={`/users/${c.byUser._id}`}
+                >
+                  @{c.byUser.username}
+                </Link>
                 <Markdown className={classes.markdownClass}>
                   {c.content}
                 </Markdown>

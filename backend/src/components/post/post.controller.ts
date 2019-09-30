@@ -24,6 +24,7 @@ export class PostController implements Controller {
     this.router.get(this.path, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
     this.router.get(`${this.path}/c/:category`, this.getPostsFromCategory);
+    this.router.get(`${this.path}/user/:id`, this.getPostsFromUser);
     this.router.post(
       this.path,
       validationMiddleware(CreatePostDto),
@@ -46,7 +47,8 @@ export class PostController implements Controller {
       const posts = await this.post
         .find()
         .populate("byUser")
-        .populate("comments");
+        .populate("comments")
+        .populate({ path: "comments", populate: "byUser" });
       response.json(posts);
     } catch (e) {
       next(new HttpException(500, e.message));
@@ -210,6 +212,25 @@ export class PostController implements Controller {
           new NotFoundException(
             `Posts in category ${request.params.category} have not been found`
           )
+        );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private getPostsFromUser = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const posts = await this.post.find({ byUser: request.params.id });
+      if (posts) {
+        response.json(posts);
+      } else {
+        new NotFoundException(
+          `Posts from user ${request.params.id} have not been found.`
         );
       }
     } catch (e) {
