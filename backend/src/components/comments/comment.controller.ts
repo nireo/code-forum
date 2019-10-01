@@ -37,6 +37,7 @@ export class CommentController implements Controller {
       validationMiddleware(UpdateCommentDto),
       this.updateComment
     );
+    this.router.get(`${this.path}/user/:id`, this.getCommentsFromUser);
   }
 
   private getToken = (request: Request): string | null => {
@@ -149,6 +150,27 @@ export class CommentController implements Controller {
         }
       } else {
         next(new HttpException(401, "Not a valid token"));
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private getCommentsFromUser = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const comments = await this.comment.find({ byUser: request.params.id });
+      if (comments) {
+        response.json(comments);
+      } else {
+        next(
+          new NotFoundException(
+            `Comments from user ${request.params.id} not found`
+          )
+        );
       }
     } catch (e) {
       next(new HttpException(500, e.message));

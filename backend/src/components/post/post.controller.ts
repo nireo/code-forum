@@ -63,7 +63,9 @@ export class PostController implements Controller {
     try {
       const post = await this.post
         .findById(request.params.id)
-        .populate("byUser");
+        .populate("byUser")
+        .populate("comments")
+        .populate({ path: "comments", populate: "byUser" });
       response.json(post);
     } catch (e) {
       next(new HttpException(500, e.message));
