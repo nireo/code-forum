@@ -6,15 +6,21 @@ import cookieParser from "cookie-parser";
 import compression from "compression";
 import helmet from "helmet";
 import cors from "cors";
+import http from "http";
+import socketio from "socket.io";
 import "dotenv/config";
 
 class App {
   public app: express.Application;
   public port: number;
+  private server: http.Server;
+  private io: socketio.Server;
 
   constructor(controllers: Controller[], port: number) {
     this.app = express();
     this.port = port;
+    this.server = http.createServer(this.app);
+    this.io = socketio(this.server);
 
     this.initMiddleware();
     this.initControllers(controllers);
@@ -36,7 +42,7 @@ class App {
   }
 
   public listen() {
-    this.app.listen(this.port, () => {
+    this.server.listen(this.port, () => {
       console.log(`App running on port ${this.port}`);
     });
   }

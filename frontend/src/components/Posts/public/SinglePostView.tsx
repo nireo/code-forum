@@ -11,7 +11,6 @@ import Markdown from "../../Markdown";
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
 import { CreateComment } from "../../../interfaces/comment.interface";
-import { Divider } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import Paper from "@material-ui/core/Paper";
 
