@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import { CreateComment } from "../../../interfaces/comment.interface";
 import { Divider } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import Paper from "@material-ui/core/Paper";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
@@ -26,6 +27,9 @@ const useStyles = makeStyles(theme => ({
   markdownClass: {
     ...theme.typography.body2,
     padding: theme.spacing(3, 0)
+  },
+  paper: {
+    padding: theme.spacing(3, 2)
   }
 }));
 
@@ -55,7 +59,6 @@ const SinglePostView: React.FC<Props> = ({
 }) => {
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
-  const [commentsLoaded, setCommentsLoaded] = useState<Boolean>(false);
   const classes = useStyles();
   useEffect(() => {
     if (posts === []) {
@@ -99,9 +102,8 @@ const SinglePostView: React.FC<Props> = ({
             </Grid>
           </Container>
           <Container maxWidth="md">
-            <Divider />
             {post.comments.map(c => (
-              <div>
+              <Paper className={classes.paper} style={{ marginBottom: "1rem" }}>
                 Posted by{" "}
                 <Link
                   style={{ textDecoration: "none" }}
@@ -112,8 +114,7 @@ const SinglePostView: React.FC<Props> = ({
                 <Markdown className={classes.markdownClass}>
                   {c.content}
                 </Markdown>
-                <Divider />
-              </div>
+              </Paper>
             ))}
           </Container>
           <Container maxWidth="md">

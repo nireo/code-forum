@@ -10,6 +10,7 @@ import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
 import Container from "@material-ui/core/Container";
 import { User } from "../../../interfaces/user.interface";
+import { Link } from "react-router-dom";
 
 type Props = {
   users?: User[];
@@ -44,7 +45,9 @@ const UserMainPage: React.FC<Props> = ({ users, initAllUsers }) => {
           <TableBody>
             {users.map(row => (
               <TableRow key={row._id}>
-                <TableCell>{row.username}</TableCell>
+                <Link to={`/users/${row._id}`}>
+                  <TableCell>{row.username}</TableCell>
+                </Link>
                 <TableCell>{row.email}</TableCell>
                 <TableCell>{row._id}</TableCell>
               </TableRow>
