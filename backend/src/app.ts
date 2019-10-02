@@ -9,6 +9,7 @@ import cors from "cors";
 import http from "http";
 import socketio from "socket.io";
 import "dotenv/config";
+import SocketHandlerInterface from "./interfaces/socket.interface";
 
 class App {
   public app: express.Application;
@@ -16,7 +17,11 @@ class App {
   private server: http.Server;
   private io: socketio.Server;
 
-  constructor(controllers: Controller[], port: number) {
+  constructor(
+    controllers: Controller[],
+    socketHandler: SocketHandlerInterface,
+    port: number
+  ) {
     this.app = express();
     this.port = port;
     this.server = http.createServer(this.app);
@@ -24,6 +29,7 @@ class App {
 
     this.initMiddleware();
     this.initControllers(controllers);
+    this.startSocketHandler(socketHandler);
   }
 
   private initMiddleware() {
@@ -33,6 +39,10 @@ class App {
     this.app.use(compression());
     this.app.use(helmet());
     this.app.use(cors());
+  }
+
+  private startSocketHandler(socketHandler: SocketHandlerInterface) {
+    this.io.on("connection", socketHandler);
   }
 
   private initControllers(controllers: Controller[]) {

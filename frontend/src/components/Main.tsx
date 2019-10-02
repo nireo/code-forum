@@ -4,7 +4,6 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Footer from "./Footer";
-import NotificationPicture from "../images/notification.jpeg";
 
 const useStyles = makeStyles(theme => ({
   root: {

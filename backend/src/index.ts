@@ -5,6 +5,7 @@ import { UserController } from "./components/user/user.controller";
 import { PostController } from "./components/post/post.controller";
 import { AuthenticationController } from "./components/authentication/authentication.controller";
 import { CommentController } from "./components/comments/comment.controller";
+import { SocketHandler } from "./socket/socket-manager";
 
 const { MONGO_URI } = process.env;
 
@@ -24,6 +25,7 @@ const app = new App(
     new PostController(),
     new CommentController()
   ],
+  new SocketHandler(),
   3001
 );
 
