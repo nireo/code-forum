@@ -17,11 +17,7 @@ class App {
   private server: http.Server;
   private io: socketio.Server;
 
-  constructor(
-    controllers: Controller[],
-    socketHandler: SocketHandlerInterface,
-    port: number
-  ) {
+  constructor(controllers: Controller[], port: number) {
     this.app = express();
     this.port = port;
     this.server = http.createServer(this.app);
@@ -29,7 +25,7 @@ class App {
 
     this.initMiddleware();
     this.initControllers(controllers);
-    this.startSocketHandler(socketHandler);
+    this.startSocketHandler();
   }
 
   private initMiddleware() {
@@ -41,8 +37,10 @@ class App {
     this.app.use(cors());
   }
 
-  private startSocketHandler(socketHandler: SocketHandlerInterface) {
-    this.io.on("connection", socketHandler);
+  private startSocketHandler() {
+    this.io.on("connection", (socket: socketio.Socket) => {
+      console.log("user connected");
+    });
   }
 
   private initControllers(controllers: Controller[]) {
