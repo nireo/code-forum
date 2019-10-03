@@ -1,5 +1,6 @@
 interface SocketUser {
   id: string;
+  socketId: string;
   username: string;
 }
 
@@ -7,31 +8,34 @@ interface SocketUser {
 // store them in a place like a database
 const users: SocketUser[] = [];
 
-const addUser = (id: string, username: string): SocketUser | object => {
-  const exists = users.find(u => u.id === id);
+export const addUser = (
+  socketId: string,
+  id: string,
+  username: string
+): SocketUser | object => {
+  const exists = users.find(u => u.socketId === socketId);
 
   // not really necessary, but just for good measure
   if (!id || !username) return { error: "Username is required" };
   if (exists) return { error: "User already exists in chat" };
 
-  const newUser: SocketUser = {
+  const user: SocketUser = {
     id,
+    socketId,
     username
   };
-  return newUser;
+  return user;
 };
 
-const removeUser = (id: string): SocketUser | undefined => {
+export const removeUser = (id: string): SocketUser | undefined => {
   const index = users.findIndex(user => user.id === id);
   if (index !== -1) return users.splice(index, 1)[0];
 };
 
-const getUser = (id: string): SocketUser | undefined => {
-  return users.find(user => user.id === id);
+export const getUser = (id: string): SocketUser | undefined => {
+  return users.find(user => user.socketId === id);
 };
 
-const getUsersInChat = () => {
+export const getUsersInChat = () => {
   return users;
 };
-
-export default { addUser, removeUser, getUser, getUsersInChat };

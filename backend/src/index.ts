@@ -27,5 +27,4 @@ const app = new App(
   3001
 );
 
-// start the server itself
 app.listen();

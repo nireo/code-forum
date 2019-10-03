@@ -9,7 +9,7 @@ import cors from "cors";
 import http from "http";
 import socketio from "socket.io";
 import "dotenv/config";
-import SocketHandlerInterface from "./interfaces/socket.interface";
+import { addUser, removeUser, getUser, getUsersInChat } from "./socket/users";
 
 class App {
   public app: express.Application;
@@ -39,7 +39,33 @@ class App {
 
   private startSocketHandler() {
     this.io.on("connection", (socket: socketio.Socket) => {
-      console.log("user connected");
+      socket.on("join", (data: any, callback) => {
+        const user = addUser(socket.id, data.id, data.username);
+        if (!user) return callback("something went wrong");
+        socket.emit("message", {
+          username: "admin",
+          id: "1",
+          text:
+            "Welcome to the code forum chat, you need to be logged in to chat"
+        });
+        socket.broadcast.emit("chatData", { users: getUsersInChat() });
+        callback();
+      });
+      socket.on("messageSent", (message: any, callback) => {
+        const user = getUser(socket.id);
+        this.io.emit("message", { user: user, text: message });
+        callback();
+      });
+      socket.on("disconnect", () => {
+        const user = removeUser(socket.id);
+        if (user) {
+          this.io.emit("message", {
+            user: "admin",
+            text: `${user.username} has left.`
+          });
+          this.io.emit("chatData", { users: getUsersInChat() });
+        }
+      });
     });
   }
 
