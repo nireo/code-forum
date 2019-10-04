@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Footer from "./Footer";
+import Chat from "./Chat";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -42,6 +43,7 @@ const Main: React.FC = () => {
           Code forum is a forum for discussing programming and learning new
           languages.
         </Typography>
+        <Chat />
       </Container>
       <Footer />
     </div>

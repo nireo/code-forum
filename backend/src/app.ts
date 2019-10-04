@@ -39,9 +39,8 @@ class App {
 
   private startSocketHandler() {
     this.io.on("connection", (socket: socketio.Socket) => {
-      socket.on("join", (data: any, callback) => {
+      socket.on("join", (data: any) => {
         const user = addUser(socket.id, data.id, data.username);
-        if (!user) return callback("something went wrong");
         socket.emit("message", {
           username: "admin",
           id: "1",
@@ -49,12 +48,10 @@ class App {
             "Welcome to the code forum chat, you need to be logged in to chat"
         });
         socket.broadcast.emit("chatData", { users: getUsersInChat() });
-        callback();
       });
       socket.on("messageSent", (message: any, callback) => {
         const user = getUser(socket.id);
         this.io.emit("message", { user: user, text: message });
-        callback();
       });
       socket.on("disconnect", () => {
         const user = removeUser(socket.id);
