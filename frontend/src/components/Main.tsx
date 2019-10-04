@@ -43,7 +43,6 @@ const Main: React.FC = () => {
           Code forum is a forum for discussing programming and learning new
           languages.
         </Typography>
-        <Chat />
       </Container>
       <Footer />
     </div>

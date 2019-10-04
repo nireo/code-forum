@@ -1,7 +1,6 @@
 import React, { useState, FormEvent } from "react";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
@@ -14,6 +13,9 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import { MenuItem, Container } from "@material-ui/core";
 import Markdown from "../../Markdown";
+import ChooseTitle from "./CreatePostSteps/Title";
+import Content from "./CreatePostSteps/Content";
+import SelectCategory from "./CreatePostSteps/SelectCategory";
 
 const useStyles = makeStyles(theme => ({
   layout: {
@@ -97,54 +99,20 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
   return (
     <div>
       <CssBaseline />
-      <Container maxWidth="md">
+      <Container maxWidth="lg">
         <Paper className={classes.paper}>
-          <Typography component="h1" variant="h4" align="center">
-            Create post
-          </Typography>
           <form
             className={classes.form}
             noValidate
             onSubmit={handlePostCreation}
           >
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              label="Title"
-              autoFocus
-              autoComplete="title"
-              value={title}
-              onChange={({ target }) => setTitle(target.value)}
-            />
-            <TextField
-              label="Content"
-              multiline
-              rows="8"
-              margin="normal"
-              variant="filled"
-              id="outlined-multiline-flexible"
-              style={{ width: "100%" }}
-              onChange={({ target }) => setContent(target.value)}
-              value={content}
-            />
+            <ChooseTitle setTitle={setTitle} title={title} />
+            <Content content={content} setContent={setContent} />
             <FormControl className={classes.formControl}>
-              <InputLabel htmlFor="category-select">Category</InputLabel>
-              <Select
-                value={categories.category}
-                onChange={handleChange}
-                inputProps={{
-                  name: "category",
-                  id: "category-select"
-                }}
-              >
-                <MenuItem value={"python"}>Python</MenuItem>
-                <MenuItem value={"js"}>Javascript</MenuItem>
-                <MenuItem value={"competetive"}>Competetive</MenuItem>
-                <MenuItem value={"books"}>Books</MenuItem>
-                <MenuItem value={"random"}>Random</MenuItem>
-              </Select>
+              <SelectCategory
+                handleChange={handleChange}
+                categories={categories}
+              />
             </FormControl>
             <Button
               type="submit"
@@ -158,10 +126,10 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
               Note: the content and comments work with markdown try it out!
             </Typography>
           </form>
-          <Typography variant="h5">Preview of content</Typography>
-          <Markdown>{content}</Markdown>
+          <Copyright />
         </Paper>
-        <Copyright />
+        <Typography variant="h5">Preview of content</Typography>
+        <Markdown>{content}</Markdown>
       </Container>
     </div>
   );
