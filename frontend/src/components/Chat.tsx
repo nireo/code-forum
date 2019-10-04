@@ -3,6 +3,9 @@ import { connect } from "react-redux";
 import io from "socket.io-client";
 import { User } from "../interfaces/user.interface";
 import Container from "@material-ui/core/Container";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
+import { TextField } from "@material-ui/core";
 
 let socket: any;
 
@@ -24,9 +27,12 @@ const Chat: React.FC<Props> = ({ user }) => {
     socket = io(endpoint);
 
     if (user) {
-      socket.emit("join", { user: user.username, id: user._id });
+      socket.emit("join", { username: user.username, id: user._id });
     } else {
-      socket.emit("join", { user: "anonymous  " });
+      socket.emit("join", {
+        username: `anonymous${Math.floor(Math.random() * 100)}`,
+        id: `${Math.floor(Math.random() * 100) ** 2}`
+      });
     }
   }, [endpoint]);
 
@@ -53,15 +59,28 @@ const Chat: React.FC<Props> = ({ user }) => {
 
   return (
     <Container maxWidth="md">
-      {messages.map(m => (
-        <li>{m}</li>
-      ))}
       <form onSubmit={sendMessage}>
-        <input
-          value={message}
-          onChange={({ target }) => setMessage(target.value)}
-        />
-        <button type="submit">Send message</button>
+        <Grid container spacing={1}>
+          <Grid item xs={9}>
+            <TextField
+              style={{ width: "100%", paddingTop: "0", marginTop: "0" }}
+              id="outlined-dense"
+              label="Message"
+              type="text"
+              name="message"
+              autoComplete="message"
+              variant="outlined"
+              margin="dense"
+              value={message}
+              onChange={({ target }) => setMessage(target.value)}
+            />
+          </Grid>
+          <Grid item xs={3}>
+            <Button type="submit" variant="contained" color="primary">
+              Send
+            </Button>
+          </Grid>
+        </Grid>
       </form>
     </Container>
   );

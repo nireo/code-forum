@@ -49,7 +49,7 @@ class App {
         });
         socket.broadcast.emit("chatData", { users: getUsersInChat() });
       });
-      socket.on("messageSent", (message: any, callback) => {
+      socket.on("messageSent", (message: any) => {
         const user = getUser(socket.id);
         this.io.emit("message", { user: user, text: message });
       });

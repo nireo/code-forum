@@ -44,6 +44,9 @@ const Main: React.FC = () => {
           languages.
         </Typography>
       </Container>
+      <Container maxWidth="sm">
+        <Chat />
+      </Container>
       <Footer />
     </div>
   );
