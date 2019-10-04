@@ -5,7 +5,7 @@ import { User } from "../interfaces/user.interface";
 import Container from "@material-ui/core/Container";
 import Grid from "@material-ui/core/Grid";
 import Button from "@material-ui/core/Button";
-import { TextField } from "@material-ui/core";
+import { TextField, Divider } from "@material-ui/core";
 
 let socket: any;
 
@@ -18,16 +18,30 @@ interface SocketUser {
   username: string;
 }
 
+interface Messageinterface {
+  username: object;
+  text: string;
+}
+
+interface SendMessage {
+  user: SocketUser;
+  text: string;
+}
+
 const Chat: React.FC<Props> = ({ user }) => {
   const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<Messageinterface[]>([]);
   const [users, setUsers] = useState<SocketUser[]>([]);
   const endpoint = "localhost:3001";
   useEffect(() => {
     socket = io(endpoint);
 
     if (user) {
-      socket.emit("join", { username: user.username, id: user._id });
+      const userObject: SocketUser = {
+        username: user.username,
+        id: user._id
+      };
+      socket.emit("join", userObject);
     } else {
       socket.emit("join", {
         username: `anonymous${Math.floor(Math.random() * 100)}`,
@@ -53,12 +67,34 @@ const Chat: React.FC<Props> = ({ user }) => {
     event.preventDefault();
 
     if (message) {
-      socket.emit("messageSent", message, () => setMessage(""));
+      socket.emit("messageSent", message, () => {
+        setMessage("");
+      });
     }
   };
 
   return (
     <Container maxWidth="md">
+      <div
+        style={{
+          height: "350px",
+          overflow: "auto"
+        }}
+      >
+        <Grid container>
+          <Grid item xs={9}>
+            {messages.map(m => {
+              return (
+                <div>
+                  <strong>{m.username}</strong>
+                  <li style={{ listStyle: "none" }}>{m.text}</li>
+                  <Divider />
+                </div>
+              );
+            })}
+          </Grid>
+        </Grid>
+      </div>
       <form onSubmit={sendMessage}>
         <Grid container spacing={1}>
           <Grid item xs={9}>
