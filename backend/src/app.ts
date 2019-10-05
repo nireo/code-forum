@@ -9,6 +9,7 @@ import cors from "cors";
 import http from "http";
 import socketio from "socket.io";
 import "dotenv/config";
+import morgan from "morgan";
 import { addUser, removeUser, getUser, getUsersInChat } from "./socket/users";
 
 class App {
@@ -35,12 +36,13 @@ class App {
     this.app.use(compression());
     this.app.use(helmet());
     this.app.use(cors());
+    this.app.use(morgan("tiny"));
   }
 
   private startSocketHandler() {
     this.io.on("connection", (socket: socketio.Socket) => {
       socket.on("join", (data: any) => {
-        const user = addUser(socket.id, data.id, data.username);
+        addUser(socket.id, data.id, data.username);
         socket.emit("message", {
           username: "admin",
           id: "1",
@@ -51,6 +53,7 @@ class App {
       });
       socket.on("messageSent", (message: any) => {
         const user = getUser(socket.id);
+        console.log(user);
         this.io.emit("message", { user: user, text: message });
       });
       socket.on("disconnect", () => {
