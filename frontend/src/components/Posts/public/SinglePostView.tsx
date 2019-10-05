@@ -13,6 +13,7 @@ import Button from "@material-ui/core/Button";
 import { CreateComment } from "../../../interfaces/comment.interface";
 import { Link } from "react-router-dom";
 import Paper from "@material-ui/core/Paper";
+import Pagination from "../../Pagination";
 
 const useStyles = makeStyles(theme => ({
   markdown: {
@@ -56,6 +57,8 @@ const SinglePostView: React.FC<Props> = ({
   getSinglePost,
   addNewComment
 }) => {
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [amountInPage, setAmountInPage] = useState<number>(3);
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
   const classes = useStyles();
@@ -84,6 +87,20 @@ const SinglePostView: React.FC<Props> = ({
     }
   };
 
+  if (post === undefined) {
+    return <Loading />;
+  }
+
+  const lastCommentIndex: number = currentPage * amountInPage;
+  const firstCommentIndex: number = lastCommentIndex - amountInPage;
+  const currentComments = post.comments.slice(
+    firstCommentIndex,
+    lastCommentIndex
+  );
+  const paginate = (pageNum: number): void => {
+    setCurrentPage(pageNum);
+  };
+
   return (
     <div>
       {post === undefined ? (
@@ -101,7 +118,7 @@ const SinglePostView: React.FC<Props> = ({
             </Grid>
           </Container>
           <Container maxWidth="md">
-            {post.comments.map(c => (
+            {currentComments.map(c => (
               <Paper className={classes.paper} style={{ marginBottom: "1rem" }}>
                 Posted by{" "}
                 <Link
@@ -115,6 +132,12 @@ const SinglePostView: React.FC<Props> = ({
                 </Markdown>
               </Paper>
             ))}
+            <Pagination
+              amountInPage={amountInPage}
+              totalPosts={post.comments.length}
+              paginate={paginate}
+              currentPage={currentPage}
+            />
           </Container>
           <Container maxWidth="md">
             <form onSubmit={createComment}>

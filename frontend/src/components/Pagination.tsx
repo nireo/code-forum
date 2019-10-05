@@ -1,16 +1,17 @@
 import React from "react";
-import { Link } from "react-router";
 
 type Props = {
   amountInPage: number;
   totalPosts: number;
-  paginate: number;
+  paginate: (pageNum: number) => void;
+  currentPage: number;
 };
 
 const Pagination: React.FC<Props> = ({
   amountInPage,
   totalPosts,
-  paginate
+  paginate,
+  currentPage
 }) => {
   const amountOfPages: number[] = [];
   for (let i = 1; i <= Math.ceil(totalPosts / amountInPage); i++) {
@@ -18,9 +19,21 @@ const Pagination: React.FC<Props> = ({
   }
   return (
     <div className="pagination">
-      {amountOfPages.map(i => (
-        <a href="#">{i}</a>
-      ))}
+      {amountOfPages.map((i: number) => {
+        if (i === currentPage) {
+          return (
+            <a key={i} className="active" onClick={() => paginate(i)} href="#">
+              {i}
+            </a>
+          );
+        } else {
+          return (
+            <a key={i} onClick={() => paginate(i)} href="#">
+              {i}
+            </a>
+          );
+        }
+      })}
     </div>
   );
 };

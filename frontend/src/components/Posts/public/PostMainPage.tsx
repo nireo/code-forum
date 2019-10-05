@@ -10,6 +10,7 @@ import { PostInterface } from "../../../interfaces/post.interface";
 import Typography from "@material-ui/core/Typography";
 import { Link } from "react-router-dom";
 import Post from "../Post";
+import Pagination from "../../Pagination";
 
 const useStyles = makeStyles(theme => ({
   sidebarBox: {
@@ -29,6 +30,8 @@ type Props = {
 const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
   // since we don't want to only show a loading bar
   const [requested, setRequested] = useState(false);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [amountInPage, setAmountInPage] = useState<number>(3);
   const classes = useStyles();
   useEffect(() => {
     if (posts) {
@@ -65,6 +68,16 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
     }
   ];
 
+  const lastPostIndex: number = currentPage * amountInPage;
+  const firstPostIndex: number = lastPostIndex - amountInPage;
+  const currentPosts: PostInterface[] = posts.slice(
+    firstPostIndex,
+    lastPostIndex
+  );
+  const paginate = (pageNum: number): void => {
+    setCurrentPage(pageNum);
+  };
+
   return (
     <div>
       <CssBaseLine />
@@ -72,9 +85,17 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
         {posts && posts.length !== 0 ? (
           <Grid container className={classes.mainGrid}>
             <Grid item xs={12} md={8}>
-              {posts.map(p => (
+              {currentPosts.map(p => (
                 <Post key={p._id} post={p} />
               ))}
+              <div style={{ paddingTop: "0.5rem" }}>
+                <Pagination
+                  amountInPage={amountInPage}
+                  totalPosts={posts.length}
+                  paginate={paginate}
+                  currentPage={currentPage}
+                />
+              </div>
             </Grid>
             <Grid item xs={12} md={4} style={{ paddingLeft: "1rem" }}>
               <Typography
