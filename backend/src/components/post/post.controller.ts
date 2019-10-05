@@ -48,7 +48,8 @@ export class PostController implements Controller {
         .find()
         .populate("byUser")
         .populate("comments")
-        .populate({ path: "comments", populate: "byUser" });
+        .populate({ path: "comments", populate: "byUser" })
+        .limit(3);
       response.json(posts);
     } catch (e) {
       next(new HttpException(500, e.message));

@@ -53,11 +53,15 @@ const NavBar: React.FC<Props> = ({ user }) => {
             code forum <Code />
           </Link>
         </Typography>
-
         <nav>
           <Link style={linkStyle} to="/posts" className={classes.link}>
             posts
           </Link>
+          {user && (
+            <Link style={linkStyle} to="/post-manager" className={classes.link}>
+              dashboard
+            </Link>
+          )}
           {!user && (
             <Link style={linkStyle} to="/login" className={classes.link}>
               login

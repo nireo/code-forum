@@ -53,7 +53,6 @@ class App {
       });
       socket.on("messageSent", (message: any) => {
         const user = getUser(socket.id);
-        console.log(user);
         this.io.emit("message", { user: user, text: message });
       });
       socket.on("disconnect", () => {

@@ -30,6 +30,7 @@ const UserMainPage: React.FC<Props> = ({ users, initAllUsers }) => {
   if (users === [] || !users) {
     return <Loading />;
   }
+
   return (
     <div>
       <CssBaseline />
