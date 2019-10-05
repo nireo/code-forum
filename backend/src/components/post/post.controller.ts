@@ -227,7 +227,10 @@ export class PostController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const posts = await this.post.find({ byUser: request.params.id });
+      const posts = await this.post
+        .find({ byUser: request.params.id })
+        .populate("-comments")
+        .populate("-byUser");
       if (posts) {
         response.json(posts);
       } else {
