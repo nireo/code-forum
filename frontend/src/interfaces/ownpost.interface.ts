@@ -4,4 +4,5 @@ export interface OwnPostInterface {
   content: string;
   likes: number;
   dislikes: number;
+  _id: string;
 }

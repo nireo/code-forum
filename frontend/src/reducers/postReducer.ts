@@ -32,6 +32,8 @@ const reducer = (state: PostInterface[] = [], action: any) => {
         postToComment.comments = postToComment.comments.concat(action.data);
       }
       return state.map(p => (p._id === action.id ? postToComment : p));
+    case "REMOVE_POST":
+      return state.filter(p => p._id !== action.data);
     default:
       return state;
   }
@@ -53,6 +55,15 @@ export const getSinglePost = (id: string) => {
     dispatch({
       type: "INIT_SINGLE",
       data: post
+    });
+  };
+};
+
+export const removePost = (id: string) => {
+  return async (dispatch: Dispatch) => {
+    await postService.deletePost(id);
+    dispatch({
+      type: "REMOVE_POST"
     });
   };
 };
