@@ -12,6 +12,7 @@ import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import userService from "../../../services/users";
 
 type Props = {
   id: string;
@@ -28,22 +29,33 @@ const SingleUserPage: React.FC<Props> = ({
   posts,
   initPosts
 }) => {
-  const [user, setUser] = useState<User | undefined>(undefined);
+  const [user, setUser] = useState<any>(undefined);
   const [userPosts, setUserPosts] = useState<PostInterface[] | undefined>(
     undefined
   );
+  const [loading, setLoading] = useState<Boolean>(false);
   useEffect(() => {
-    if (users === []) {
-      initAllUsers();
-    } else {
-      setUser(users.find(u => u._id === id));
-    }
-    if (posts && user) {
-      setUserPosts(posts.filter(p => p.byUser._id === user._id));
-    } else {
-      initPosts();
+    // if (users === []) {
+    //   initAllUsers();
+    // } else {
+    //   setUser(users.find(u => u._id === id));
+    // }
+    // if (posts && user) {
+    //   setUserPosts(posts.filter(p => p.byUser._id === user._id));
+    // } else {
+    //   initPosts();
+    // }
+    if (user === undefined) {
+      setLoading(true);
+      const userData = userService.getUserById(id);
+      setUser(userData);
+      setLoading(false);
     }
   }, [users]);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   if (users === [] || user === undefined) {
     return <Loading />;

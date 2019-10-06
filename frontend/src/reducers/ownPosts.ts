@@ -23,6 +23,10 @@ export const getUsersPosts = (id: string) => {
   };
 };
 
+export const setData = (data: any) => {
+  return { type: "SET_DATA", data: data };
+};
+
 export const clearUsersPosts = () => {
   return { type: "CLEAR_POSTS" };
 };

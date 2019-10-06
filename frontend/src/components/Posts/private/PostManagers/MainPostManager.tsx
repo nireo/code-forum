@@ -2,9 +2,9 @@ import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { User } from "../../../../interfaces/user.interface";
 import { OwnPostInterface } from "../../../../interfaces/ownpost.interface";
-import { getUsersPosts } from "../../../../reducers/ownPosts";
+import { getUsersPosts, setData } from "../../../../reducers/ownPosts";
+import postService from "../../../../services/posts";
 import Container from "@material-ui/core/Container";
-import Typography from "@material-ui/core/Typography";
 import TextField from "@material-ui/core/TextField";
 import { removePost } from "../../../../reducers/postReducer";
 import Loading from "../../../Loading";
@@ -19,19 +19,28 @@ type Props = {
   ownPosts: OwnPostInterface[];
   getUsersPosts: (id: string) => Promise<void>;
   removePost: (id: string) => Promise<void>;
+  setData: (data: any) => void;
 };
 
 const MainPostManager: React.FC<Props> = ({
   user,
   ownPosts,
   getUsersPosts,
+  setData,
   removePost
 }) => {
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
     if (user) {
       if (ownPosts === []) {
-        getUsersPosts(user._id);
+        postService
+          .getPostsFromUser(user._id)
+          .then(data => {
+            setData(data);
+          })
+          .catch(e => {
+            console.log(e);
+          });
       }
     }
   }, [ownPosts, user]);
@@ -93,5 +102,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { getUsersPosts, removePost }
+  { getUsersPosts, removePost, setData }
 )(MainPostManager);

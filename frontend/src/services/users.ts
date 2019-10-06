@@ -1,5 +1,5 @@
 import axios from "axios";
-import CreateUser from "../interfaces/user.interface";
+import CreateUser, { User } from "../interfaces/user.interface";
 import Login from "../interfaces/login.interface";
 const baseUrl: string = "/api/user";
 const authUrl: string = "/api/auth";
