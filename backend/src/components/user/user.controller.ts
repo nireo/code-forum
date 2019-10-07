@@ -5,8 +5,6 @@ import userModel from "./user.model";
 import { HttpException } from "../../exceptions/HttpException";
 import { NextFunction } from "connect";
 import { NotFoundException } from "../../exceptions/NotFoundException";
-import RequestWithUser from "../../interfaces/requestWithUser";
-import authMiddleware from "../../utils/auth.middleware";
 import jwt from "jsonwebtoken";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
 
@@ -21,7 +19,7 @@ export class UserController implements Controller {
 
   public initRoutes() {
     this.router.get(this.path, this.getAllUsers);
-    this.router.get(`${this.path}/:id`, this.getUserById);
+    this.router.get(`${this.path}/:amount`, this.getUserById);
     this.router.patch(`${this.path}/:id`, this.updateUser);
     this.router.delete(`${this.path}/:id`, this.deleteUser);
   }
@@ -40,11 +38,22 @@ export class UserController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const users = await this.user.find({}).populate("posts");
-      if (users) {
-        response.send(users);
+      if (request.params.amount) {
+        let users;
+        // unary operator converts page string into integer
+        const amount: number = +request.params.amount;
+        if (amount > 10) {
+          next(new HttpException(400, "Too many users requested"));
+        } else {
+          users = await this.user.find().limit(amount);
+          if (users) {
+            response.send(users);
+          } else {
+            next(new NotFoundException("No users have been found"));
+          }
+        }
       } else {
-        next(new NotFoundException("No users have been found"));
+        next(new HttpException(400, "You need to add amount as a parameter"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));

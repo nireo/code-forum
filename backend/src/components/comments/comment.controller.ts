@@ -12,7 +12,6 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
 import userModel from "../user/user.model";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
-import { isUserWhitespacable } from "@babel/types";
 
 export class CommentController implements Controller {
   public path: string = "/api/comment";
@@ -31,6 +30,7 @@ export class CommentController implements Controller {
       validationMiddleware(CreateCommentDto),
       this.createComment
     );
+    this.router.get(`${this.path}/:id`, this.getCommentsInPost);
     this.router.delete(`${this.path}/:id`, this.deleteComment);
     this.router.patch(
       `${this.path}/:id`,
@@ -171,6 +171,23 @@ export class CommentController implements Controller {
             `Comments from user ${request.params.id} not found`
           )
         );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private getCommentsInPost = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const post = await this.comment.find({ toPost: request.params.id });
+      if (post) {
+        response.json(post);
+      } else {
+        next(new NotFoundException("No post found"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));
