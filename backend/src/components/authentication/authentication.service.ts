@@ -19,9 +19,8 @@ class AuthenticationService {
       ...userData,
       password: hashedPassword
     });
-
     // more efficient way of using delete
-    user.password = undefined;
+    user.password = "";
     const token = this.createToken(user);
     return {
       token,

@@ -39,9 +39,9 @@ const reducer = (state: PostInterface[] = [], action: any) => {
   }
 };
 
-export const initPosts = () => {
+export const initPosts = (page: string) => {
   return async (dispatch: Dispatch) => {
-    const posts = await postService.getPosts();
+    const posts = await postService.getPosts(page);
     dispatch({
       type: "INIT_POSTS",
       data: posts

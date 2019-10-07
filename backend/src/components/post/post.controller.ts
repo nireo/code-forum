@@ -21,7 +21,7 @@ export class PostController implements Controller {
   }
 
   public initRoutes() {
-    this.router.get(this.path, this.getAllPosts);
+    this.router.get(`${this.path}/:page`, this.getAllPosts);
     this.router.get(`${this.path}/:id`, this.getPostById);
     this.router.get(`${this.path}/c/:category`, this.getPostsFromCategory);
     this.router.get(`${this.path}/user/:id`, this.getPostsFromUser);
@@ -44,13 +44,30 @@ export class PostController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const posts = await this.post
-        .find()
-        .populate("byUser")
-        .populate("comments")
-        .populate({ path: "comments", populate: "byUser" })
-        .limit(3);
-      response.json(posts);
+      if (request.params.page) {
+        let posts;
+        // unary operator converts page string into integer
+        const page: number = +request.params.page;
+        if (page === 1) {
+          posts = await this.post
+            .find()
+            .populate("byUser")
+            .populate("comments")
+            .populate({ path: "comments", populate: "byUser" })
+            .limit(3);
+        } else {
+          posts = await this.post
+            .find()
+            .populate("byUser")
+            .populate("comments")
+            .populate({ path: "comments", populate: "user" })
+            .skip(3 * page - 1)
+            .limit(3 * page);
+        }
+        response.json(posts);
+      } else {
+        next(new HttpException(500, "Please provide a page number"));
+      }
     } catch (e) {
       next(new HttpException(500, e.message));
     }

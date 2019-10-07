@@ -32,11 +32,14 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
   const [requested, setRequested] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [amountInPage, setAmountInPage] = useState<number>(3);
+
+  // to see which pages have content, so we can get the posts smartly
+  const [pagesWithContent, setPagesWithContent] = useState<number[]>([]);
   const classes = useStyles();
   useEffect(() => {
     if (posts) {
       if (!requested && posts.length === 0) {
-        initPosts();
+        initPosts(String(currentPage));
         setRequested(true);
       }
     }

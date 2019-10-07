@@ -6,7 +6,6 @@ import Loading from "../../Loading";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import { PostInterface } from "../../../interfaces/post.interface";
-import { initPosts } from "../../../reducers/postReducer";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import TableHead from "@material-ui/core/TableHead";
@@ -19,15 +18,13 @@ type Props = {
   users: User[];
   posts: PostInterface[];
   initAllUsers: () => Promise<void>;
-  initPosts: () => Promise<void>;
 };
 
 const SingleUserPage: React.FC<Props> = ({
   users,
   initAllUsers,
   id,
-  posts,
-  initPosts
+  posts
 }) => {
   const [user, setUser] = useState<any>(undefined);
   const [userPosts, setUserPosts] = useState<PostInterface[] | undefined>(
@@ -95,5 +92,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { initAllUsers, initPosts }
+  { initAllUsers }
 )(SingleUserPage);

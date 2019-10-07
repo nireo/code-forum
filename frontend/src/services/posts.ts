@@ -17,8 +17,8 @@ const getPostById = async (id: string) => {
   return response.data;
 };
 
-const getPosts = async () => {
-  const response = await axios.get(baseUrl);
+const getPosts = async (page: string) => {
+  const response = await axios.get(`${baseUrl}/${page}`);
   return response.data;
 };
 
