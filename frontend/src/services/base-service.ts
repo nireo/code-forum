@@ -34,7 +34,7 @@ export default class BaseHttpService {
       .catch(error => this.handleError(error));
   }
 
-  private getTokenHeaders(): object {
+  getTokenHeaders(): object {
     return {
       headers: {
         Authorization: `bearer ${this.token}`
@@ -42,7 +42,11 @@ export default class BaseHttpService {
     };
   }
 
-  private handleError(error: any) {
+  handleError(error: any) {
     throw error;
+  }
+
+  saveToken(token: string) {
+    this.token = token;
   }
 }
