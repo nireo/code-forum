@@ -1,7 +1,7 @@
 import BaseHttpService from "./base-service";
 
 export default class UserService extends BaseHttpService {
-  private userServiceUrl = "/api/user";
+  private userServiceUrl: string = "/api/user";
 
   async getUsers() {
     return this.get(this.userServiceUrl);
