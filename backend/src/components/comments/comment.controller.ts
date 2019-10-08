@@ -6,7 +6,6 @@ import { HttpException } from "../../exceptions/HttpException";
 import CreateCommentDto, { UpdateCommentDto } from "./comment.dto";
 import RequestWithUser from "../../interfaces/requestWithUser";
 import postModel from "../post/post.model";
-import authMiddleware from "../../utils/auth.middleware";
 import validationMiddleware from "../../utils/validation.middleware";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
@@ -30,7 +29,7 @@ export class CommentController implements Controller {
       validationMiddleware(CreateCommentDto),
       this.createComment
     );
-    this.router.get(`${this.path}/:id`, this.getCommentsInPost);
+    this.router.get(`${this.path}/:id/:page`, this.getCommentsInPost);
     this.router.delete(`${this.path}/:id`, this.deleteComment);
     this.router.patch(
       `${this.path}/:id`,
@@ -183,11 +182,30 @@ export class CommentController implements Controller {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const post = await this.comment.find({ toPost: request.params.id });
-      if (post) {
-        response.json(post);
+      if (request.params.page) {
+        let comments;
+        const page: number = +request.params.page;
+        if (page === 1) {
+          comments = await this.comment
+            .find({ toPost: request.params.id })
+            .limit(3);
+        } else {
+          comments = await this.comment
+            .find({ toPost: request.params.id })
+            .skip(3 * page - 3)
+            .limit(3 * page);
+        }
+        if (comments) {
+          response.json(comments);
+        } else {
+          next(
+            new NotFoundException(
+              `No comments found for post: ${request.params.id}`
+            )
+          );
+        }
       } else {
-        next(new NotFoundException("No post found"));
+        next(new HttpException(400, "Bad request: No page provided"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));

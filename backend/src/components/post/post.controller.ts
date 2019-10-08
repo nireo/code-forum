@@ -61,7 +61,7 @@ export class PostController implements Controller {
             .populate("byUser")
             .populate("comments")
             .populate({ path: "comments", populate: "user" })
-            .skip(3 * page - 1)
+            .skip(3 * page - 3)
             .limit(3 * page);
         }
         response.json(posts);
