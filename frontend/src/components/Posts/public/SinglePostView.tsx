@@ -154,14 +154,28 @@ const SinglePostView: React.FC<Props> = ({
                 value={comment}
                 onChange={({ target }) => setComment(target.value)}
               />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                className={classes.submit}
-              >
-                Submit comment
-              </Button>
+              <Grid>
+                <Grid item xs={7}>
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    className={classes.submit}
+                  >
+                    Submit comment
+                  </Button>
+                </Grid>
+                <Grid item xs={4}>
+                  <Button
+                    variant="contained"
+                    className={classes.submit}
+                    color="primary"
+                  >
+                    Show preview
+                  </Button>
+                </Grid>
+              </Grid>
+
               <Typography variant="body2">
                 Note: the content and comments work with markdown try it out!
               </Typography>

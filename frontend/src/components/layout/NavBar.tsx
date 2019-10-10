@@ -74,6 +74,9 @@ const NavBar: React.FC<Props> = ({ user }) => {
           <Link style={linkStyle} to="/users" className={classes.link}>
             users
           </Link>
+          <Link style={linkStyle} to="/settings" className={classes.link}>
+            settings
+          </Link>
         </nav>
       </ToolBar>
     </AppBar>
