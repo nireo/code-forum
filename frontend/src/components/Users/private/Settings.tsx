@@ -34,7 +34,7 @@ const Settings: React.FC<Props> = ({ user }) => {
 
   const handlePasswordChange = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (confirmNewPassword === newPassword && newPassword != "") {
+    if (confirmNewPassword === newPassword && newPassword !== "") {
     }
   };
 

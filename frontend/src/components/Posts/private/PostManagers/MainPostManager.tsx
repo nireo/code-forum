@@ -43,7 +43,7 @@ const MainPostManager: React.FC<Props> = ({
           });
       }
     }
-  }, [ownPosts, user]);
+  }, [ownPosts, user, setData]);
 
   const handleRemove = async (id: string) => {
     if (window.confirm(`Are you sure you want to delete ${id}`)) {

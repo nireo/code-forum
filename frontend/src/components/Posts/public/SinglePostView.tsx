@@ -40,16 +40,16 @@ type Props = {
   addNewComment: (id: string, newComment: CreateComment) => Promise<void>;
 };
 
-const findPost = (
-  posts: PostInterface[],
-  id: string
-): undefined | PostInterface => {
-  const post = posts.find(p => p._id === id);
-  if (post) {
-    return post;
-  }
-  return undefined;
-};
+// const findPost = (
+//   posts: PostInterface[],
+//   id: string
+// ): undefined | PostInterface => {
+//   const post = posts.find(p => p._id === id);
+//   if (post) {
+//     return post;
+//   }
+//   return undefined;
+// };
 
 const SinglePostView: React.FC<Props> = ({
   posts,
@@ -58,7 +58,7 @@ const SinglePostView: React.FC<Props> = ({
   addNewComment
 }) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [amountInPage, setAmountInPage] = useState<number>(3);
+  const [amountInPage] = useState<number>(3);
   const [post, setPost] = useState<PostInterface | undefined>(undefined);
   const [comment, setComment] = useState<string>("");
   const classes = useStyles();
@@ -73,7 +73,7 @@ const SinglePostView: React.FC<Props> = ({
         setPost(posts.find(p => p._id === id));
       }
     }
-  }, [id, getSinglePost, setPost, post]);
+  }, [id, getSinglePost, setPost, post, posts]);
 
   const createComment = async (
     event: FormEvent<HTMLFormElement>

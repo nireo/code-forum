@@ -22,13 +22,13 @@ const Pagination: React.FC<Props> = ({
       {amountOfPages.map((i: number) => {
         if (i === currentPage) {
           return (
-            <a key={i} className="active" onClick={() => paginate(i)} href="#">
+            <a key={i} className="active" onClick={() => paginate(i)}>
               {i}
             </a>
           );
         } else {
           return (
-            <a key={i} onClick={() => paginate(i)} href="#">
+            <a key={i} onClick={() => paginate(i)}>
               {i}
             </a>
           );

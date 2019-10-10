@@ -31,10 +31,10 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
   // since we don't want to only show a loading bar
   const [requested, setRequested] = useState(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [amountInPage, setAmountInPage] = useState<number>(3);
+  const [amountInPage] = useState<number>(3);
 
   // to see which pages have content, so we can get the posts smartly
-  const [pagesWithContent, setPagesWithContent] = useState<number[]>([]);
+  // const [pagesWithContent, setPagesWithContent] = useState<number[]>([]);
   const classes = useStyles();
   useEffect(() => {
     if (posts) {
@@ -43,7 +43,7 @@ const PostMainPage: React.FC<Props> = ({ posts, initPosts }) => {
         setRequested(true);
       }
     }
-  }, [posts, initPosts, requested]);
+  }, [posts, initPosts, requested, currentPage]);
 
   const programmingSubjects = [
     {

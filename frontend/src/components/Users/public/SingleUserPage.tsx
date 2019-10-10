@@ -27,9 +27,7 @@ const SingleUserPage: React.FC<Props> = ({
   posts
 }) => {
   const [user, setUser] = useState<any>(undefined);
-  const [userPosts, setUserPosts] = useState<PostInterface[] | undefined>(
-    undefined
-  );
+  const [userPosts] = useState<PostInterface[] | undefined>(undefined);
   const [loading, setLoading] = useState<Boolean>(false);
   useEffect(() => {
     // if (users === []) {
@@ -48,7 +46,7 @@ const SingleUserPage: React.FC<Props> = ({
       setUser(userData);
       setLoading(false);
     }
-  }, [users]);
+  }, [users, id, user]);
 
   if (loading) {
     return <Loading />;

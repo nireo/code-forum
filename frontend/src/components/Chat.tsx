@@ -48,7 +48,7 @@ const Chat: React.FC<Props> = ({ user }) => {
         id: `${Math.floor(Math.random() * 100) ** 2}`
       });
     }
-  }, [endpoint]);
+  }, [endpoint, user]);
 
   useEffect(() => {
     socket.on("message", (message: any) => {
@@ -56,12 +56,13 @@ const Chat: React.FC<Props> = ({ user }) => {
     });
     socket.on("chatData", (data: any) => {
       setUsers(data.users);
+      console.log(users);
     });
     return () => {
       socket.emit("disconnect");
       socket.off();
     };
-  }, [messages]);
+  }, [messages, users]);
 
   const sendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
