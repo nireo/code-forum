@@ -4,7 +4,7 @@ export default class UserService extends BaseHttpService {
   private userServiceUrl: string = "/api/user";
 
   async getUsers() {
-    return this.get(this.userServiceUrl);
+    return this.get(`${this.userServiceUrl}/1`);
   }
 
   async getUserById(id: string) {
