@@ -5,6 +5,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Footer from "./Footer";
 import Chat from "./Chat";
+import "./styles.css";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -30,6 +31,7 @@ const Main: React.FC = () => {
           align="center"
           color="textPrimary"
           gutterBottom
+          className="main-page-heading"
         >
           Welcome to code forum
         </Typography>
@@ -39,6 +41,7 @@ const Main: React.FC = () => {
           align="center"
           color="textSecondary"
           paragraph
+          className="main-page-sub-heading"
         >
           Code forum is a forum for discussing programming and learning new
           languages.

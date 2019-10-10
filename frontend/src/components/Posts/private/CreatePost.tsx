@@ -3,7 +3,7 @@ import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Paper from "@material-ui/core/Paper";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles, Theme } from "@material-ui/core/styles";
 import Copyright from "../../Copyright";
 import { connect } from "react-redux";
 import { CreatePost } from "../../../reducers/postReducer";
@@ -17,7 +17,7 @@ import ChooseTitle from "./CreatePostSteps/Title";
 import Content from "./CreatePostSteps/Content";
 import SelectCategory from "./CreatePostSteps/SelectCategory";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   layout: {
     width: "auto",
     marginLeft: theme.spacing(2),
@@ -84,7 +84,7 @@ const CreatePostForm: React.FC<Props> = ({ CreatePost }) => {
       content,
       category: categories.category
     };
-    await CreatePost(newPost);
+    CreatePost(newPost);
   };
 
   const handleChange = (

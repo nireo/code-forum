@@ -22,6 +22,10 @@ export class UserController implements Controller {
     this.router.get(`${this.path}/:amount`, this.getUserById);
     this.router.patch(`${this.path}/:id`, this.updateUser);
     this.router.delete(`${this.path}/:id`, this.deleteUser);
+    this.router.get(
+      `${this.path}/username/:username`,
+      this.getUserWithUsername
+    );
   }
 
   private getToken = (request: Request): string | null => {
@@ -108,11 +112,11 @@ export class UserController implements Controller {
     }
   };
 
-  private deleteUser = (
+  private deleteUser = async (
     request: Request,
     response: Response,
-    next: express.NextFunction
-  ): void => {
+    next: NextFunction
+  ): Promise<void> => {
     try {
       const token = this.getToken(request);
       if (token) {
@@ -121,7 +125,7 @@ export class UserController implements Controller {
           "EnvSecret"
         ) as DataStoredInToken;
         if (decodedToken) {
-          this.user.findByIdAndDelete(decodedToken._id).then(success => {
+          await this.user.findByIdAndDelete(decodedToken._id).then(success => {
             if (success) {
               response.status(204);
             } else {
@@ -130,6 +134,27 @@ export class UserController implements Controller {
             }
           });
         }
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private getUserWithUsername = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const user = await this.user.find({ username: request.params.username });
+      if (user) {
+        response.json(user);
+      } else {
+        next(
+          new NotFoundException(
+            `${request.params.username} has not been found.`
+          )
+        );
       }
     } catch (e) {
       next(new HttpException(500, e.message));
