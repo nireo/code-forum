@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { connect } from "react-redux";
 import { User } from "../../../interfaces/user.interface";
 import Container from "@material-ui/core/Container";
@@ -27,6 +27,13 @@ const Settings: React.FC<Props> = ({ user }) => {
   const classes = useStyles();
   const [newPassword, setNewPassword] = useState<string>("");
   const [confirmNewPassword, setConfirmNewPassword] = useState<string>("");
+  const [warning, setWarning] = useState<string>("");
+
+  useEffect(() => {
+    if (newPassword !== confirmNewPassword) {
+      setWarning("The passwords need to match");
+    }
+  }, [newPassword, setNewPassword]);
 
   if (!user) {
     return <NotFound />;

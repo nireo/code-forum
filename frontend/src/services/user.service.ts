@@ -14,4 +14,8 @@ export default class UserService extends BaseHttpService {
   async deleteUser(id: string) {
     return this.delete(`${this.userServiceUrl}/${id}`);
   }
+
+  async updatePassword(password: string) {
+    return this.post(`${this.userServiceUrl}/update`, { password });
+  }
 }

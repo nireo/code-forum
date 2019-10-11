@@ -7,6 +7,9 @@ import { NextFunction } from "connect";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
+import bcrypt from "bcrypt";
+import validationMiddleware from "../../utils/validation.middleware";
+import { UpdatePassword } from "./user.dto";
 
 export class UserController implements Controller {
   public path: string = "/api/user";
@@ -25,6 +28,11 @@ export class UserController implements Controller {
     this.router.get(
       `${this.path}/username/:username`,
       this.getUserWithUsername
+    );
+    this.router.post(
+      `${this.path}/update`,
+      validationMiddleware(UpdatePassword),
+      this.changeUserPassword
     );
   }
 
@@ -155,6 +163,47 @@ export class UserController implements Controller {
             `${request.params.username} has not been found.`
           )
         );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private changeUserPassword = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const token = this.getToken(request);
+      const { password } = request.body;
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          const user = await this.user.findById(request.params.id);
+          if (user) {
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const updated = await this.user.findById(
+              decodedToken._id,
+              { ...user, password: hashedPassword },
+              { new: true }
+            );
+            if (updated) {
+              response.json(updated);
+            } else {
+              next(new HttpException(500, "Internal server error"));
+            }
+          } else {
+            next(new NotFoundException("User not found"));
+          }
+        } else {
+          next(new HttpException(401, "Invalid token"));
+        }
+      } else {
+        next(new HttpException(401, "Invalid token"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));
