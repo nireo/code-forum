@@ -215,42 +215,65 @@ export class UserController implements Controller {
     }
   };
 
+  // for checking functions true = user already exists and false = doesn't
+  private checkEmailDuplicate = async (email: string): Promise<Boolean> => {
+    const user = await this.user.find({ email: email });
+    if (user) {
+      return true;
+    }
+    return false;
+  };
+
+  private checkUsernameDuplicate = async (
+    username: string
+  ): Promise<Boolean> => {
+    const user = await this.user.find({ username: username });
+    if (user) {
+      return true;
+    }
+    return false;
+  };
+
   private changeUsername = async (
     request: Request,
     response: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const token = await this.getToken(request);
-      if (token) {
-        const decodedToken = jwt.verify(
-          token,
-          "EnvSecret"
-        ) as DataStoredInToken;
-        if (decodedToken) {
-          const userData = await this.user.findById(decodedToken._id);
-          if (userData) {
-            const user = await this.user.findByIdAndUpdate(
-              decodedToken._id,
-              {
-                ...userData,
-                username: request.body.username
-              },
-              { new: true }
-            );
-            if (user) {
-              response.json(user);
+      if (this.checkUsernameDuplicate(request.body.username)) {
+        next(new HttpException(403, "User already exists"));
+      } else {
+        const token = await this.getToken(request);
+        if (token) {
+          const decodedToken = jwt.verify(
+            token,
+            "EnvSecret"
+          ) as DataStoredInToken;
+          if (decodedToken) {
+            const userData = await this.user.findById(decodedToken._id);
+            if (userData) {
+              const user = await this.user.findByIdAndUpdate(
+                decodedToken._id,
+                {
+                  ...userData,
+                  username: request.body.username
+                },
+                { new: true }
+              );
+              if (user) {
+                response.json(user);
+              } else {
+                next(new HttpException(500, "Internal server error"));
+              }
             } else {
-              next(new HttpException(500, "Internal server error"));
+              next(new NotFoundException("User has not been found"));
             }
           } else {
-            next(new NotFoundException("User has not been found"));
+            next(new HttpException(401, "Invalid token"));
           }
         } else {
           next(new HttpException(401, "Invalid token"));
         }
-      } else {
-        next(new HttpException(401, "Invalid token"));
       }
     } catch (e) {
       next(new HttpException(500, e.message));

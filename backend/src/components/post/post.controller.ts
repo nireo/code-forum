@@ -36,6 +36,7 @@ export class PostController implements Controller {
       validationMiddleware(UpdatePostDto),
       this.updatePost
     );
+    this.router.get(`${this.path}/recent`, this.getRecentTitles);
   }
 
   private getAllPosts = async (
@@ -255,6 +256,32 @@ export class PostController implements Controller {
         new NotFoundException(
           `Posts from user ${request.params.id} have not been found.`
         );
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  // this is for the feature on the frontpage to get the most recent posts
+  private getRecentTitles = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      interface PostTitleAndId {
+        title: string;
+        _id: string;
+      }
+      let filtered: PostTitleAndId[] = [];
+      const posts = await this.post.find().limit(6);
+      if (posts) {
+        posts.forEach(p => {
+          filtered = filtered.concat({ title: p.title, _id: p._id });
+        });
+        response.json(filtered);
+      } else {
+        next(new NotFoundException("No posts were found."));
       }
     } catch (e) {
       next(new HttpException(500, e.message));
