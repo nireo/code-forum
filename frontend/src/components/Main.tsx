@@ -1,11 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Footer from "./Footer";
 import Chat from "./Chat";
+import Card from "@material-ui/core/Card";
+import { connect } from "react-redux";
 import "./styles.css";
+import { PostInterface } from "../interfaces/post.interface";
+import Loading from "./Loading";
+import { Link } from "react-router-dom";
+import { initPosts } from "../reducers/postReducer";
 
 const useStyles = makeStyles(theme => ({
   root: {
@@ -19,8 +25,20 @@ const useStyles = makeStyles(theme => ({
   }
 }));
 
-const Main: React.FC = () => {
+type Props = {
+  posts: PostInterface[];
+  initPosts: (page: string) => Promise<void>;
+};
+
+const Main: React.FC<Props> = ({ posts, initPosts }) => {
   const classes = useStyles();
+
+  useEffect(() => {
+    if (!posts) {
+      initPosts("1");
+    }
+  }, [posts, initPosts]);
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -50,9 +68,33 @@ const Main: React.FC = () => {
       <Container maxWidth="md">
         <Chat />
       </Container>
+      <Container maxWidth="md" style={{ marginTop: "2rem" }}>
+        <Typography variant="h5" align="center" color="textSecondary">
+          Recent
+          {posts ? (
+            posts.map(p => (
+              <Card>
+                <Typography variant="h6" component="h2">
+                  {p.title}
+                </Typography>
+                <Link to={`/post/${p._id}`}>Read more</Link>
+              </Card>
+            ))
+          ) : (
+            <Loading />
+          )}
+        </Typography>
+      </Container>
       <Footer />
     </div>
   );
 };
 
-export default Main;
+const mapStateToProps = (state: any) => ({
+  posts: state.posts
+});
+
+export default connect(
+  mapStateToProps,
+  { initPosts }
+)(Main);
