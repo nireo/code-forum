@@ -16,4 +16,14 @@ export class UpdatePassword {
   public password: string | undefined;
 }
 
+export class UpdateUsername {
+  @IsString()
+  public username: string | undefined;
+}
+
+export class UpdateEmail {
+  @IsString()
+  public email: string | undefined;
+}
+
 export default CreateUserDto;
