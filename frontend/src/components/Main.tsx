@@ -41,7 +41,6 @@ const Main: React.FC<Props> = ({ posts, initPosts }) => {
 
   return (
     <div className={classes.root}>
-      <CssBaseline />
       <Container component="main" className={classes.main} maxWidth="lg">
         <Typography
           variant="h2"
