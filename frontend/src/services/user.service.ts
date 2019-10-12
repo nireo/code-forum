@@ -18,4 +18,16 @@ export default class UserService extends BaseHttpService {
   async updatePassword(password: string) {
     return this.post(`${this.userServiceUrl}/update`, { password });
   }
+
+  async changeEmail(newEmail: string) {
+    return this.post(`${this.userServiceUrl}/update/email`, {
+      email: newEmail
+    });
+  }
+
+  async changeUsername(newUsername: string) {
+    return this.post(`${this.userServiceUrl}/update/username`, {
+      username: newUsername
+    });
+  }
 }
