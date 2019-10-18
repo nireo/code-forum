@@ -10,6 +10,7 @@ import userModel from "../user/user.model";
 import validationMiddleware from "../../utils/validation.middleware";
 import TokenMissingException from "../../exceptions/TokenMissing";
 import NotAuthorizedException from "../../exceptions/NotAuthorized";
+import { NotFoundException } from "../../exceptions/NotFoundException";
 
 export class ReportController implements Controller {
   public path: string = "/api/report";
@@ -29,6 +30,7 @@ export class ReportController implements Controller {
     );
 
     this.router.delete(`${this.path}/:id`, this.removeReport);
+    this.router.get(this.path, this.getReport);
   }
 
   private getToken = (request: Request): string | null => {
@@ -37,6 +39,36 @@ export class ReportController implements Controller {
       return authorization.substring(7);
     }
     return null;
+  };
+
+  private getReport = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const token = this.getToken(request);
+      if (token) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          const reports = await this.report.find({ from: decodedToken._id });
+          if (reports) {
+            response.json(reports);
+          } else {
+            next(new NotFoundException(request.params.id));
+          }
+        } else {
+          next(new TokenMissingException());
+        }
+      } else {
+        next(new TokenMissingException());
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
   };
 
   private createReport = async (
