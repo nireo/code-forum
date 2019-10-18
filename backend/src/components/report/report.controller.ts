@@ -29,6 +29,12 @@ export class ReportController implements Controller {
       this.createReport
     );
 
+    this.router.put(
+      `${this.path}/:id`,
+      validationMiddleware(CreateReport),
+      this.updateReport
+    );
+
     this.router.delete(`${this.path}/:id`, this.removeReport);
     this.router.get(this.path, this.getReport);
   }
@@ -153,6 +159,43 @@ export class ReportController implements Controller {
             }
           } else {
             next(new NotAuthorizedException());
+          }
+        } else {
+          next(new NotAuthorizedException());
+        }
+      } else {
+        next(new TokenMissingException());
+      }
+    } catch (e) {
+      next(new HttpException(500, e.message));
+    }
+  };
+
+  private updateReport = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const token = this.getToken(request);
+
+      // since CreateReport is exactly the same we can use the same dto.
+      const newContent: CreateReport = request.body;
+      if (token && newContent) {
+        const decodedToken = jwt.verify(
+          token,
+          "EnvSecret"
+        ) as DataStoredInToken;
+        if (decodedToken) {
+          const updated = await this.report.findByIdAndUpdate(
+            request.params.id,
+            { ...newContent },
+            { new: true }
+          );
+          if (updated) {
+            response.json(updated);
+          } else {
+            next(new NotFoundException(request.params.id));
           }
         } else {
           next(new NotAuthorizedException());
