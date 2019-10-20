@@ -23,6 +23,7 @@ import Settings from "./components/Users/private/Settings";
 import { User } from "./interfaces/user.interface";
 import NotFound from "./components/NotFound";
 import MainPostManager from "./components/Posts/private/PostManagers/MainPostManager";
+import Dashboard from "./components/dashboard/Dashboard";
 
 type Props = {
   user?: User;
@@ -89,6 +90,7 @@ const App: React.FC<Props> = ({ user, checkLocalStorage }) => {
           render={() => (user ? <Settings /> : <Redirect to="/" />)}
         />
         <Route exact path="/post-manager" render={() => <MainPostManager />} />
+        <Route exact path="/dashboard" render={() => <Dashboard />} />
         <Route render={() => <NotFound />} />
       </Switch>
     </Router>
