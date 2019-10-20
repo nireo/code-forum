@@ -1,6 +1,6 @@
 import React, { FormEvent } from "react";
 import { connect } from "react-redux";
-import { User } from "../../interfaces/user.interface";
+import { User, PersonalUser } from "../../interfaces/user.interface";
 import Loading from "../Loading";
 import { logUserOut } from "../../reducers/userReducer";
 import UserService from "../../services/user.service";
@@ -9,6 +9,7 @@ import Paper from "@material-ui/core/Paper";
 import Container from "@material-ui/core/Container";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
 
 const useStyles = makeStyles((theme: Theme) => ({
   paper: {
@@ -17,7 +18,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 }));
 
 type Props = {
-  user?: User;
+  user?: PersonalUser;
   logUserOut: () => void;
 };
 
@@ -36,7 +37,7 @@ const Dashboard: React.FC<Props> = ({ user, logUserOut }) => {
         logUserOut();
         userService.deleteUser(user._id);
       } catch {
-        console.log("make notifications lady man");
+        console.log("make notifications lazy man");
       }
     }
   };
@@ -60,6 +61,14 @@ const Dashboard: React.FC<Props> = ({ user, logUserOut }) => {
             Delete account
           </Button>
         </form>
+      </Paper>
+      <Paper className={classes.paper} style={{ marginTop: "1rem" }}>
+        <Typography variant="h5" component="h2">
+          Posts
+        </Typography>
+        <Grid container xs={12}>
+          {!user.posts ? <Loading /> : user.posts.map(p => <p>{p.title}</p>)}
+        </Grid>
       </Paper>
     </Container>
   );

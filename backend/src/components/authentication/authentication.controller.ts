@@ -69,7 +69,10 @@ export class AuthenticationController implements Controller {
   ) => {
     try {
       const logInData: LogInDto = request.body;
-      const user = await this.user.findOne({ username: logInData.username });
+      const user = await this.user
+        .findOne({ username: logInData.username })
+        .populate("posts")
+        .populate("comments");
       if (user) {
         const isPasswordMatching = await bcrypt.compare(
           logInData.password,
