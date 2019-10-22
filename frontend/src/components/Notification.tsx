@@ -11,6 +11,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import { makeStyles, Theme } from "@material-ui/core/styles";
 import Snackbar from "@material-ui/core/Snackbar";
 import IconButton from "@material-ui/core/IconButton";
+import Notification from "../interfaces/notificationInterface";
 
 const iconVariants = {
   success: CheckCircleIcon,
@@ -56,7 +57,7 @@ type ContentProps = {
   onClose: () => void;
 };
 
-const contentWrapper: React.FC<ContentProps> = (props: ContentProps) => {
+const ContentWrapper: React.FC<ContentProps> = (props: ContentProps) => {
   const classes = useStyles();
   const { className, content, onClose, type, ...other } = props;
   const Icon = iconVariants[type];
@@ -87,8 +88,11 @@ const contentWrapper: React.FC<ContentProps> = (props: ContentProps) => {
 };
 
 const Notification: React.FC<Props> = ({ notification }) => {
-  const classes = useStyles();
   const [open, setOpen] = useState<boolean>(false);
+
+  if (notification === null) {
+    return null;
+  }
 
   useEffect(() => {
     if (!(notification === null)) {
@@ -105,6 +109,72 @@ const Notification: React.FC<Props> = ({ notification }) => {
     }
   };
 
+  if (notification.type === "error") {
+    return (
+      <div>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left"
+          }}
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+        >
+          <ContentWrapper
+            onClose={handleClose}
+            type="error"
+            content={notification.content}
+          />
+        </Snackbar>
+      </div>
+    );
+  }
+
+  if (notification.type === "warning") {
+    return (
+      <div>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left"
+          }}
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+        >
+          <ContentWrapper
+            onClose={handleClose}
+            type="error"
+            content={notification.content}
+          />
+        </Snackbar>
+      </div>
+    );
+  }
+
+  if (notification.type === "info") {
+    return (
+      <div>
+        <Snackbar
+          anchorOrigin={{
+            vertical: "bottom",
+            horizontal: "left"
+          }}
+          open={open}
+          autoHideDuration={3000}
+          onClose={handleClose}
+        >
+          <ContentWrapper
+            onClose={handleClose}
+            type="error"
+            content={notification.content}
+          />
+        </Snackbar>
+      </div>
+    );
+  }
+
   return (
     <div>
       <Snackbar
@@ -115,7 +185,13 @@ const Notification: React.FC<Props> = ({ notification }) => {
         open={open}
         autoHideDuration={3000}
         onClose={handleClose}
-      ></Snackbar>
+      >
+        <ContentWrapper
+          onClose={handleClose}
+          type="success"
+          content={notification.content}
+        />
+      </Snackbar>
     </div>
   );
 };
