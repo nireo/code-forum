@@ -14,98 +14,98 @@ import jwt from "jsonwebtoken";
 import { ResponseUser } from "./user.res.interface";
 
 export class AuthenticationController implements Controller {
-  public path: string = "/api/auth";
-  public router: Router = express.Router();
-  private user = userModel;
+    public path: string = "/api/auth";
+    public router: Router = express.Router();
+    private user = userModel;
 
-  constructor() {
-    this.initRoutes();
-  }
-
-  private initRoutes() {
-    this.router.post(
-      `${this.path}/new`,
-      validationMiddleware(CreateUserDto),
-      this.registration
-    );
-    this.router.post(
-      `${this.path}/login`,
-      validationMiddleware(LogInDto),
-      this.logIn
-    );
-  }
-
-  private registration = async (
-    request: express.Request,
-    response: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      const userData: CreateUserDto = request.body;
-      if (await this.user.findOne({ email: userData.email })) {
-        next(new HttpException(400, "User already exists"));
-      } else {
-        const hashedPassword = await bcrypt.hash(userData.password, 10);
-        const user = await this.user.create({
-          ...userData,
-          password: hashedPassword
-        });
-        const tokenData = this.createToken(user);
-        const userReturn: ResponseUser = {
-          user,
-          tokenData
-        };
-        response.send(userReturn);
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
+    constructor() {
+        this.initRoutes();
     }
-  };
 
-  private logIn = async (
-    request: express.Request,
-    response: express.Response,
-    next: express.NextFunction
-  ) => {
-    try {
-      const logInData: LogInDto = request.body;
-      const user = await this.user
-        .findOne({ username: logInData.username })
-        .populate("posts")
-        .populate("comments");
-      if (user) {
-        const isPasswordMatching = await bcrypt.compare(
-          logInData.password,
-          user.password
+    private initRoutes() {
+        this.router.post(
+            `${this.path}/new`,
+            validationMiddleware(CreateUserDto),
+            this.registration
         );
-        if (isPasswordMatching) {
-          const tokenData = this.createToken(user);
-          const userObject: ResponseUser = {
-            user,
-            tokenData
-          };
-          response.json(userObject);
-        } else {
-          next(new HttpException(403, "Forbidden"));
-        }
-      } else {
-        next(new NotFoundException("Not found"));
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
+        this.router.post(
+            `${this.path}/login`,
+            validationMiddleware(LogInDto),
+            this.logIn
+        );
     }
-  };
 
-  private createToken(user: User): TokenData {
-    const dataStoredInToken: DataStoredInToken = {
-      _id: user._id
+    private registration = async (
+        request: express.Request,
+        response: express.Response,
+        next: express.NextFunction
+    ) => {
+        try {
+            const userData: CreateUserDto = request.body;
+            if (await this.user.findOne({ email: userData.email })) {
+                next(new HttpException(400, "User already exists"));
+            } else {
+                const hashedPassword = await bcrypt.hash(userData.password, 10);
+                const user = await this.user.create({
+                    ...userData,
+                    password: hashedPassword
+                });
+                const tokenData = this.createToken(user);
+                const userReturn: ResponseUser = {
+                    user,
+                    tokenData
+                };
+                response.send(userReturn);
+            }
+        } catch (e) {
+            next(new HttpException(500, e.message));
+        }
     };
-    // 60 * 60 * 24 is one day
-    const expiresIn = 60 * 60 * 24;
-    const secret: string = "EnvSecret";
-    return {
-      expiresIn,
-      token: jwt.sign(dataStoredInToken, secret, { expiresIn })
+
+    private logIn = async (
+        request: express.Request,
+        response: express.Response,
+        next: express.NextFunction
+    ) => {
+        try {
+            const logInData: LogInDto = request.body;
+            const user = await this.user
+                .findOne({ username: logInData.username })
+                .populate("posts")
+                .populate("comments");
+            if (user) {
+                const isPasswordMatching = await bcrypt.compare(
+                    logInData.password,
+                    user.password
+                );
+                if (isPasswordMatching) {
+                    const tokenData = this.createToken(user);
+                    const userObject: ResponseUser = {
+                        user,
+                        tokenData
+                    };
+                    response.json(userObject);
+                } else {
+                    next(new HttpException(403, "Forbidden"));
+                }
+            } else {
+                next(new NotFoundException("Not found"));
+            }
+        } catch (e) {
+            next(new HttpException(500, e.message));
+        }
     };
-  }
+
+    private createToken(user: User): TokenData {
+        const dataStoredInToken: DataStoredInToken = {
+            _id: user._id
+        };
+        // 60 * 60 * 24 is one day
+        const expiresIn = 60 * 60 * 24;
+        const secret: string = "EnvSecret";
+        return {
+            expiresIn,
+            token: jwt.sign(dataStoredInToken, secret, { expiresIn })
+        };
+    }
 }

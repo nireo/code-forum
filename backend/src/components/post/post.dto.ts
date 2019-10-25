@@ -1,28 +1,28 @@
 import { IsString, IsNumber } from "class-validator";
 
 class CreatePostDto {
-  @IsString()
-  public title!: string;
+    @IsString()
+    public title!: string;
 
-  @IsString()
-  public content!: string;
+    @IsString()
+    public content!: string;
 
-  @IsString()
-  public category!: string;
+    @IsString()
+    public category!: string;
 }
 
 export class UpdatePostDto {
-  @IsString()
-  title!: string;
+    @IsString()
+    title!: string;
 
-  @IsString()
-  content!: string;
+    @IsString()
+    content!: string;
 
-  @IsNumber()
-  likes!: number;
+    @IsNumber()
+    likes!: number;
 
-  @IsNumber()
-  dislikes!: number;
+    @IsNumber()
+    dislikes!: number;
 }
 
 export default CreatePostDto;

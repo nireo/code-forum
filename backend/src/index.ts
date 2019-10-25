@@ -19,14 +19,14 @@ connectToDatabase(`${MONGO_URI}`);
 
 // init controllers
 const app = new App(
-  [
-    new UserController(),
-    new AuthenticationController(),
-    new PostController(),
-    new CommentController(),
-    new ReportController()
-  ],
-  3001
+    [
+        new UserController(),
+        new AuthenticationController(),
+        new PostController(),
+        new CommentController(),
+        new ReportController()
+    ],
+    3001
 );
 
 app.listen();

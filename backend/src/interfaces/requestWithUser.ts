@@ -3,8 +3,8 @@ import User from "../components/user/user.interface";
 import TokenData from "./token.data.interface";
 
 interface RequestWithUser extends Request {
-  user?: User;
-  token?: string;
+    user?: User;
+    token?: string;
 }
 
 export default RequestWithUser;

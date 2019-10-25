@@ -1,6 +1,6 @@
 import { IsString } from "class-validator";
 
 export class CreateReport {
-  @IsString()
-  public content: string | undefined;
+    @IsString()
+    public content: string | undefined;
 }

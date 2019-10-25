@@ -1,5 +1,5 @@
 export default interface Report {
-  content: string;
-  from: string;
-  to: string;
+    content: string;
+    from: string;
+    to: string;
 }

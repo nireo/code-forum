@@ -13,198 +13,202 @@ import NotAuthorizedException from "../../exceptions/NotAuthorized";
 import { NotFoundException } from "../../exceptions/NotFoundException";
 
 export class ReportController implements Controller {
-  public path: string = "/api/report";
-  public router: Router = express.Router();
-  private report = reportModel;
-  private user = userModel;
+    public path: string = "/api/report";
+    public router: Router = express.Router();
+    private report = reportModel;
+    private user = userModel;
 
-  constructor() {
-    this.initRoutes();
-  }
-
-  public initRoutes() {
-    this.router.post(
-      `${this.path}/:id`,
-      validationMiddleware(CreateReport),
-      this.createReport
-    );
-
-    this.router.put(
-      `${this.path}/:id`,
-      validationMiddleware(CreateReport),
-      this.updateReport
-    );
-
-    this.router.delete(`${this.path}/:id`, this.removeReport);
-    this.router.get(this.path, this.getReport);
-  }
-
-  private getToken = (request: Request): string | null => {
-    const authorization: string | undefined = request.get("authorization");
-    if (authorization && authorization.toLowerCase().startsWith("bearer")) {
-      return authorization.substring(7);
+    constructor() {
+        this.initRoutes();
     }
-    return null;
-  };
 
-  private getReport = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const token = this.getToken(request);
-      if (token) {
-        const decodedToken = jwt.verify(
-          token,
-          "EnvSecret"
-        ) as DataStoredInToken;
-        if (decodedToken) {
-          const reports = await this.report.find({ from: decodedToken._id });
-          if (reports) {
-            response.json(reports);
-          } else {
-            next(new NotFoundException(request.params.id));
-          }
-        } else {
-          next(new TokenMissingException());
+    public initRoutes() {
+        this.router.post(
+            `${this.path}/:id`,
+            validationMiddleware(CreateReport),
+            this.createReport
+        );
+
+        this.router.put(
+            `${this.path}/:id`,
+            validationMiddleware(CreateReport),
+            this.updateReport
+        );
+
+        this.router.delete(`${this.path}/:id`, this.removeReport);
+        this.router.get(this.path, this.getReport);
+    }
+
+    private getToken = (request: Request): string | null => {
+        const authorization: string | undefined = request.get("authorization");
+        if (authorization && authorization.toLowerCase().startsWith("bearer")) {
+            return authorization.substring(7);
         }
-      } else {
-        next(new TokenMissingException());
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
-    }
-  };
+        return null;
+    };
 
-  private createReport = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const token = this.getToken(request);
-      const data: CreateReport = request.body;
-      if (token && data) {
-        const decodedToken = jwt.verify(
-          token,
-          "EnvSecret"
-        ) as DataStoredInToken;
-        if (decodedToken) {
-          const user = await this.user.findById(decodedToken._id);
-          if (user) {
-            const newReport = new this.report({
-              ...data,
-              from: user._id,
-              to: request.params.id
-            });
-            const saved = await newReport.save();
-            await saved
-              .populate("from")
-              .populate("to")
-              .execPopulate();
-            response.json(saved);
-          } else {
-            next(new HttpException(403, "Forbidden"));
-          }
-        } else {
-          next(new HttpException(401, "Invalid token"));
-        }
-      } else {
-        next(new HttpException(401, "Invalid token"));
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
-    }
-  };
-
-  private checkUserOwnership = async (
-    reportId: string,
-    userId: string
-  ): Promise<boolean> => {
-    const report = await this.report.findById(reportId);
-    if (report) {
-      if (report.from === userId) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  private removeReport = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const token = this.getToken(request);
-      if (token) {
-        const decodedToken = jwt.verify(
-          token,
-          "EnvSecret"
-        ) as DataStoredInToken;
-
-        const user = await this.report.findById(decodedToken._id);
-        if (user) {
-          if (this.checkUserOwnership(request.params.id, user._id)) {
-            const deleted = await this.report.findByIdAndRemove(
-              request.params.id
-            );
-            if (deleted) {
-              response.status(204).json({
-                success: `removed ${request.params.id} successfully`
-              });
+    private getReport = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = this.getToken(request);
+            if (token) {
+                const decodedToken = jwt.verify(
+                    token,
+                    "EnvSecret"
+                ) as DataStoredInToken;
+                if (decodedToken) {
+                    const reports = await this.report.find({
+                        from: decodedToken._id
+                    });
+                    if (reports) {
+                        response.json(reports);
+                    } else {
+                        next(new NotFoundException(request.params.id));
+                    }
+                } else {
+                    next(new TokenMissingException());
+                }
             } else {
-              next(new HttpException(500, "Internal server error"));
+                next(new TokenMissingException());
             }
-          } else {
-            next(new NotAuthorizedException());
-          }
-        } else {
-          next(new NotAuthorizedException());
+        } catch (e) {
+            next(new HttpException(500, e.message));
         }
-      } else {
-        next(new TokenMissingException());
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
-    }
-  };
+    };
 
-  private updateReport = async (
-    request: Request,
-    response: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const token = this.getToken(request);
-
-      // since CreateReport is exactly the same we can use the same dto.
-      const newContent: CreateReport = request.body;
-      if (token && newContent) {
-        const decodedToken = jwt.verify(
-          token,
-          "EnvSecret"
-        ) as DataStoredInToken;
-        if (decodedToken) {
-          const updated = await this.report.findByIdAndUpdate(
-            request.params.id,
-            { ...newContent },
-            { new: true }
-          );
-          if (updated) {
-            response.json(updated);
-          } else {
-            next(new NotFoundException(request.params.id));
-          }
-        } else {
-          next(new NotAuthorizedException());
+    private createReport = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = this.getToken(request);
+            const data: CreateReport = request.body;
+            if (token && data) {
+                const decodedToken = jwt.verify(
+                    token,
+                    "EnvSecret"
+                ) as DataStoredInToken;
+                if (decodedToken) {
+                    const user = await this.user.findById(decodedToken._id);
+                    if (user) {
+                        const newReport = new this.report({
+                            ...data,
+                            from: user._id,
+                            to: request.params.id
+                        });
+                        const saved = await newReport.save();
+                        await saved
+                            .populate("from")
+                            .populate("to")
+                            .execPopulate();
+                        response.json(saved);
+                    } else {
+                        next(new HttpException(403, "Forbidden"));
+                    }
+                } else {
+                    next(new HttpException(401, "Invalid token"));
+                }
+            } else {
+                next(new HttpException(401, "Invalid token"));
+            }
+        } catch (e) {
+            next(new HttpException(500, e.message));
         }
-      } else {
-        next(new TokenMissingException());
-      }
-    } catch (e) {
-      next(new HttpException(500, e.message));
-    }
-  };
+    };
+
+    private checkUserOwnership = async (
+        reportId: string,
+        userId: string
+    ): Promise<boolean> => {
+        const report = await this.report.findById(reportId);
+        if (report) {
+            if (report.from === userId) {
+                return true;
+            }
+        }
+        return false;
+    };
+
+    private removeReport = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = this.getToken(request);
+            if (token) {
+                const decodedToken = jwt.verify(
+                    token,
+                    "EnvSecret"
+                ) as DataStoredInToken;
+
+                const user = await this.report.findById(decodedToken._id);
+                if (user) {
+                    if (this.checkUserOwnership(request.params.id, user._id)) {
+                        const deleted = await this.report.findByIdAndRemove(
+                            request.params.id
+                        );
+                        if (deleted) {
+                            response.status(204).json({
+                                success: `removed ${request.params.id} successfully`
+                            });
+                        } else {
+                            next(
+                                new HttpException(500, "Internal server error")
+                            );
+                        }
+                    } else {
+                        next(new NotAuthorizedException());
+                    }
+                } else {
+                    next(new NotAuthorizedException());
+                }
+            } else {
+                next(new TokenMissingException());
+            }
+        } catch (e) {
+            next(new HttpException(500, e.message));
+        }
+    };
+
+    private updateReport = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            const token = this.getToken(request);
+
+            // since CreateReport is exactly the same we can use the same dto.
+            const newContent: CreateReport = request.body;
+            if (token && newContent) {
+                const decodedToken = jwt.verify(
+                    token,
+                    "EnvSecret"
+                ) as DataStoredInToken;
+                if (decodedToken) {
+                    const updated = await this.report.findByIdAndUpdate(
+                        request.params.id,
+                        { ...newContent },
+                        { new: true }
+                    );
+                    if (updated) {
+                        response.json(updated);
+                    } else {
+                        next(new NotFoundException(request.params.id));
+                    }
+                } else {
+                    next(new NotAuthorizedException());
+                }
+            } else {
+                next(new TokenMissingException());
+            }
+        } catch (e) {
+            next(new HttpException(500, e.message));
+        }
+    };
 }
