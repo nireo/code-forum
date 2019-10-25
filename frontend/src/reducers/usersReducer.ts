@@ -1,6 +1,9 @@
 import { Dispatch } from "redux";
 import userService from "../services/users";
 import { User } from "../interfaces/user.interface";
+import UserService from "../services/user.service";
+
+const classUserService = new UserService();
 
 const reducer = (state: User[] = [], action: any) => {
   switch (action.type) {
@@ -13,6 +16,12 @@ const reducer = (state: User[] = [], action: any) => {
       return action.data;
     case "CLEAR_USERS":
       return [];
+    case "ADD_MORE_USERS":
+      if (state === []) {
+        return action.data;
+      }
+
+      return [...state, action.data];
     default:
       return state;
   }
@@ -35,6 +44,16 @@ export const initAllUsers = () => {
     const users = await userService.getUsers();
     dispatch({
       type: "INIT_USERS",
+      data: users
+    });
+  };
+};
+
+export const initAmountOfUsers = (amount: string) => {
+  return async (dispatch: Dispatch) => {
+    const users = await classUserService.getUsersWithAmount(amount);
+    dispatch({
+      type: "ADD_MORE_USERS",
       data: users
     });
   };

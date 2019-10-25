@@ -9,6 +9,7 @@ import { NotFoundException } from "../../exceptions/NotFoundException";
 import jwt from "jsonwebtoken";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
 import userModel from "../user/user.model";
+import InternalServerException from "../../exceptions/InternalServer";
 
 export class PostController implements Controller {
   public path: string = "/api/post";
@@ -285,6 +286,27 @@ export class PostController implements Controller {
       }
     } catch (e) {
       next(new HttpException(500, e.message));
+    }
+  };
+
+  private getAmountOfPosts = async (
+    request: Request,
+    response: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      await this.post.countDocuments({}, (err: any, results: number) => {
+        if (err) {
+          next(new InternalServerException());
+          return;
+        }
+
+        response.json({
+          amount: results
+        });
+      });
+    } catch (e) {
+      next(e);
     }
   };
 }

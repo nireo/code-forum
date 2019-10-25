@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
-import { initAllUsers } from "../../../reducers/usersReducer";
+import {
+  initAllUsers,
+  initAmountOfUsers
+} from "../../../reducers/usersReducer";
 import Loading from "../../Loading";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Table from "@material-ui/core/Table";
@@ -15,14 +18,19 @@ import { Link } from "react-router-dom";
 type Props = {
   users?: User[];
   initAllUsers: () => void;
+  initAmountOfUsers: (amount: string) => void;
 };
 
-const UserMainPage: React.FC<Props> = ({ users, initAllUsers }) => {
+const UserMainPage: React.FC<Props> = ({
+  users,
+  initAllUsers,
+  initAmountOfUsers
+}) => {
   const [requested, setRequested] = useState(false);
   useEffect(() => {
     if (users) {
       if (!requested && users.length === 0) {
-        initAllUsers();
+        initAmountOfUsers("10");
         setRequested(true);
       }
     }
@@ -68,5 +76,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { initAllUsers }
+  { initAllUsers, initAmountOfUsers }
 )(UserMainPage);

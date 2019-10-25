@@ -30,4 +30,8 @@ export default class UserService extends BaseHttpService {
       username: newUsername
     });
   }
+
+  async getUsersWithAmount(amount: string) {
+    return this.get(`${this.userServiceUrl}/${amount}`);
+  }
 }

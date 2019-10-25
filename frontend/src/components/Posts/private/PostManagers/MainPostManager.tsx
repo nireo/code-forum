@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { User } from "../../../../interfaces/user.interface";
-import { OwnPostInterface } from "../../../../interfaces/ownpost.interface";
-import { getUsersPosts, setData } from "../../../../reducers/ownPosts";
 import postService from "../../../../services/posts";
 import Container from "@material-ui/core/Container";
 import TextField from "@material-ui/core/TextField";
@@ -16,48 +14,21 @@ import TableCell from "@material-ui/core/TableCell";
 
 type Props = {
   user: User;
-  ownPosts: OwnPostInterface[];
-  getUsersPosts: (id: string) => Promise<void>;
   removePost: (id: string) => Promise<void>;
-  setData: (data: any) => void;
 };
 
-const MainPostManager: React.FC<Props> = ({
-  user,
-  ownPosts,
-  getUsersPosts,
-  setData,
-  removePost
-}) => {
+const MainPostManager: React.FC<Props> = ({ user, removePost }) => {
   const [search, setSearch] = useState<string>("");
   useEffect(() => {
     if (user) {
-      if (ownPosts === []) {
-        postService
-          .getPostsFromUser(user._id)
-          .then(data => {
-            setData(data);
-          })
-          .catch(e => {
-            console.log(e);
-          });
-      }
     }
-  }, [ownPosts, user, setData]);
+  }, [user]);
 
   const handleRemove = async (id: string) => {
     if (window.confirm(`Are you sure you want to delete ${id}`)) {
       await removePost(id);
     }
   };
-
-  if (ownPosts === []) {
-    return <Loading />;
-  }
-
-  const filteredSearch = search
-    ? ownPosts.filter(p => p.title.toLowerCase().includes(search.toLowerCase()))
-    : ownPosts;
 
   return (
     <Container maxWidth="md">
@@ -81,15 +52,7 @@ const MainPostManager: React.FC<Props> = ({
             <TableCell>actions</TableCell>
           </TableRow>
         </TableHead>
-        <TableBody>
-          {filteredSearch.map(p => (
-            <TableRow key={p._id}>
-              <TableCell>{p.title}</TableCell>
-              <TableCell>{p.content.slice(0, 20)}</TableCell>
-              <TableCell onClick={() => handleRemove(p._id)}>Delete</TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
+        <TableBody></TableBody>
       </Table>
     </Container>
   );
@@ -102,5 +65,5 @@ const mapStateToProps = (state: any) => ({
 
 export default connect(
   mapStateToProps,
-  { getUsersPosts, removePost, setData }
+  { removePost }
 )(MainPostManager);
