@@ -49,6 +49,7 @@ const UserMainPage: React.FC<Props> = ({
             }
         }
     }, [users, initAllUsers, requested]);
+
     if (users === [] || !users) {
         return <Loading />;
     }
