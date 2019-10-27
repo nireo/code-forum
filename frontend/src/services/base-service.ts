@@ -1,52 +1,61 @@
 import axios from "axios";
 
 export default class BaseHttpService {
-  public token: null | string = null;
+    public token: null | string = null;
 
-  async get(endpoint: string, options: object = {}) {
-    Object.assign(options, this.getTokenHeaders());
-    return axios.get(endpoint, options).catch(error => this.handleError(error));
-  }
+    async get(endpoint: string, options: object = {}) {
+        Object.assign(options, this.getTokenHeaders());
+        const response = await axios
+            .get(endpoint, options)
+            .catch(error => this.handleError(error));
+        return response.data;
+    }
 
-  async post(endpoint: string, options: object = {}) {
-    Object.assign(options, this.getTokenHeaders());
-    return axios
-      .post(endpoint, options)
-      .catch(error => this.handleError(error));
-  }
+    async post(endpoint: string, options: object = {}) {
+        Object.assign(options, this.getTokenHeaders());
+        const response = await axios
+            .post(endpoint, options)
+            .catch(error => this.handleError(error));
+        return response.data;
+    }
 
-  async delete(endpoint: string, options: object = {}) {
-    Object.assign(options, this.getTokenHeaders());
-    return axios
-      .delete(endpoint, options)
-      .catch(error => this.handleError(error));
-  }
+    async delete(endpoint: string, options: object = {}) {
+        Object.assign(options, this.getTokenHeaders());
+        const response = await axios
+            .delete(endpoint, options)
+            .catch(error => this.handleError(error));
+        return response.data;
+    }
 
-  async put(endpoint: string, options: object = {}) {
-    Object.assign(options, this.getTokenHeaders());
-    return axios.put(endpoint, options).catch(error => this.handleError(error));
-  }
+    async put(endpoint: string, options: object = {}) {
+        Object.assign(options, this.getTokenHeaders());
+        const response = await axios
+            .put(endpoint, options)
+            .catch(error => this.handleError(error));
+        return response.data;
+    }
 
-  async patch(endpoint: string, options: object = {}) {
-    Object.assign(options, this.getTokenHeaders());
-    return axios
-      .patch(endpoint, options)
-      .catch(error => this.handleError(error));
-  }
+    async patch(endpoint: string, options: object = {}) {
+        Object.assign(options, this.getTokenHeaders());
+        const response = await axios
+            .patch(endpoint, options)
+            .catch(error => this.handleError(error));
+        return response.data;
+    }
 
-  getTokenHeaders(): object {
-    return {
-      headers: {
-        Authorization: `bearer ${this.token}`
-      }
-    };
-  }
+    getTokenHeaders(): object {
+        return {
+            headers: {
+                Authorization: `bearer ${this.token}`
+            }
+        };
+    }
 
-  handleError(error: any) {
-    throw error;
-  }
+    handleError(error: any) {
+        throw error;
+    }
 
-  saveToken(token: string) {
-    this.token = token;
-  }
+    saveToken(token: string) {
+        this.token = token;
+    }
 }
