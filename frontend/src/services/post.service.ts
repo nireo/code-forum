@@ -1,5 +1,8 @@
 import BaseHttpService from "./base-service";
-import { CreatePostInterface } from "../interfaces/post.interface";
+import {
+    CreatePostInterface,
+    PostInterface
+} from "../interfaces/post.interface";
 
 export default class PostService extends BaseHttpService {
     private postServiceUrl: string = "/api/post";
@@ -26,6 +29,10 @@ export default class PostService extends BaseHttpService {
 
     async createPost(newPost: CreatePostInterface) {
         return this.post(`${this.postServiceUrl}`, newPost);
+    }
+
+    async updatePost(updatedPost: PostInterface, id: string) {
+        return this.put(`${this.postServiceUrl}/${id}`, updatedPost);
     }
 
     async getPostAmount() {
