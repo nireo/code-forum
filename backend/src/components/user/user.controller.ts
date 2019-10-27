@@ -23,8 +23,8 @@ export class UserController implements Controller {
 
     public initRoutes() {
         this.router.get(this.path, this.getAllUsers);
-        this.router.get(`${this.path}/amount`, this.getAmountOfUsers);
-        this.router.get(`${this.path}/:amount`, this.getUserById);
+        this.router.get(`${this.path}/amount/main`, this.getAmountOfUsers);
+        this.router.get(`${this.path}/amount/:amount`, this.getUserById);
         this.router.patch(`${this.path}/:id`, this.updateUser);
         this.router.delete(`${this.path}/:id`, this.deleteUser);
         this.router.get(

@@ -3,6 +3,9 @@ import axios from "axios";
 export default class BaseHttpService {
     public token: null | string = null;
 
+    // the 'Object.assign' is used to add other parameters, if needed
+    // otherwise it adds the token headers by default.
+
     async get(endpoint: string, options: object = {}) {
         Object.assign(options, this.getTokenHeaders());
         const response = await axios
