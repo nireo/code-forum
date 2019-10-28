@@ -25,6 +25,7 @@ export class UserController implements Controller {
         this.router.get(this.path, this.getAllUsers);
         this.router.get(`${this.path}/amount/main`, this.getAmountOfUsers);
         this.router.get(`${this.path}/amount/:amount`, this.getUserById);
+        this.router.get(`${this.path}/search/:term`, this.searchForUser);
         this.router.patch(`${this.path}/:id`, this.updateUser);
         this.router.delete(`${this.path}/:id`, this.deleteUser);
         this.router.get(
@@ -372,6 +373,30 @@ export class UserController implements Controller {
             });
         } catch (e) {
             next(new InternalServerException());
+        }
+    };
+
+    private searchForUser = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            await this.user.find(
+                {
+                    $text: { $search: request.params.term }
+                },
+                (err: any, results: any) => {
+                    if (err) {
+                        next(new InternalServerException());
+                        return;
+                    }
+
+                    response.json(results);
+                }
+            );
+        } catch (e) {
+            next(new HttpException(500, e.message));
         }
     };
 }
