@@ -40,6 +40,19 @@ postScheme.set("toJSON", {
     }
 });
 
+postScheme.index(
+    {
+        title: "text",
+        content: "text"
+    },
+    {
+        weights: {
+            title: 5,
+            content: 1
+        }
+    }
+);
+
 const post = mongoose.model<Post & mongoose.Document>("Post", postScheme);
 
 export default post;

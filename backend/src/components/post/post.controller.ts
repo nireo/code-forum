@@ -26,6 +26,7 @@ export class PostController implements Controller {
         this.router.get(`${this.path}/:id`, this.getPostById);
         this.router.get(`${this.path}/c/:category`, this.getPostsFromCategory);
         this.router.get(`${this.path}/user/:id`, this.getPostsFromUser);
+        this.router.get(`${this.path}/search/:term`, this.searchForPosts);
         this.router.post(
             this.path,
             validationMiddleware(CreatePostDto),
@@ -314,6 +315,30 @@ export class PostController implements Controller {
             });
         } catch (e) {
             next(e);
+        }
+    };
+
+    private searchForPosts = async (
+        request: Request,
+        response: Response,
+        next: NextFunction
+    ): Promise<void> => {
+        try {
+            await this.post.find(
+                {
+                    $text: { $search: request.params.term }
+                },
+                (err: any, results: any) => {
+                    if (err) {
+                        next(new InternalServerException());
+                        return;
+                    }
+
+                    response.json(results);
+                }
+            );
+        } catch (e) {
+            next(new HttpException(500, e.message));
         }
     };
 }
