@@ -11,6 +11,7 @@ import bcrypt from "bcrypt";
 import validationMiddleware from "../../utils/validation.middleware";
 import { UpdatePassword, UpdateUsername, UpdateEmail } from "./user.dto";
 import InternalServerException from "../../exceptions/InternalServer";
+import TokenMissingException from "../../exceptions/TokenMissing";
 
 export class UserController implements Controller {
     public path: string = "/api/user";
@@ -118,22 +119,30 @@ export class UserController implements Controller {
     ): Promise<void> => {
         try {
             const token = this.getToken(request);
-            if (token) {
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                if (decodedToken) {
-                    const userData: User = request.body;
-                    const user = await this.user.findByIdAndUpdate(
-                        decodedToken._id,
-                        userData,
-                        { new: true }
-                    );
-                    response.json(user);
-                } else {
-                    next(new HttpException(401, "Invalid token"));
-                }
+            if (!token) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const userData: User = request.body;
+            const user = await this.user.findByIdAndUpdate(
+                decodedToken._id,
+                userData,
+                { new: true }
+            );
+            if (user) {
+                response.json(user);
+            } else {
+                return;
             }
         } catch (e) {
             next(new HttpException(500, e.message));
@@ -147,24 +156,29 @@ export class UserController implements Controller {
     ): Promise<void> => {
         try {
             const token = this.getToken(request);
-            if (token) {
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                if (decodedToken) {
-                    await this.user
-                        .findByIdAndDelete(decodedToken._id)
-                        .then(success => {
-                            if (success) {
-                                response.status(204);
-                            } else {
-                                // post not found
-                                next(new HttpException(404, "User not found"));
-                            }
-                        });
-                }
+            if (!token) {
+                next(new TokenMissingException());
+                return;
             }
+
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+            await this.user
+                .findByIdAndDelete(decodedToken._id)
+                .then(success => {
+                    if (success) {
+                        response.status(204);
+                    } else {
+                        // post not found
+                        next(new HttpException(404, "User not found"));
+                    }
+                });
         } catch (e) {
             next(new HttpException(500, e.message));
         }
@@ -199,37 +213,37 @@ export class UserController implements Controller {
         next: NextFunction
     ): Promise<void> => {
         try {
-            const token = this.getToken(request);
             const { password } = request.body;
-            if (token) {
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                if (decodedToken) {
-                    const user = await this.user.findById(request.params.id);
-                    if (user) {
-                        const hashedPassword = await bcrypt.hash(password, 10);
-                        const updated = await this.user.findById(
-                            decodedToken._id,
-                            { ...user, password: hashedPassword },
-                            { new: true }
-                        );
-                        if (updated) {
-                            response.json(updated);
-                        } else {
-                            next(
-                                new HttpException(500, "Internal server error")
-                            );
-                        }
-                    } else {
-                        next(new NotFoundException("User not found"));
-                    }
-                } else {
-                    next(new HttpException(401, "Invalid token"));
-                }
+            const token = this.getToken(request);
+
+            if (!token || !password) {
+                next(new TokenMissingException());
+                return;
+            }
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+            const user = await this.user.findById(request.params.id);
+            if (!user) {
+                next(new NotFoundException("User has not been found"));
+                return;
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const updated = await this.user.findById(
+                decodedToken._id,
+                { ...user, password: hashedPassword },
+                { new: true }
+            );
+            if (updated) {
+                response.json(updated);
             } else {
-                next(new HttpException(401, "Invalid token"));
+                return;
             }
         } catch (e) {
             next(new HttpException(500, e.message));
@@ -261,52 +275,45 @@ export class UserController implements Controller {
         next: NextFunction
     ): Promise<void> => {
         try {
-            if (this.checkUsernameDuplicate(request.body.username)) {
-                next(new HttpException(403, "User already exists"));
-            } else {
-                const token = await this.getToken(request);
-                if (token) {
-                    const decodedToken = jwt.verify(
-                        token,
-                        "EnvSecret"
-                    ) as DataStoredInToken;
-                    if (decodedToken) {
-                        const userData = await this.user.findById(
-                            decodedToken._id
-                        );
-                        if (userData) {
-                            const user = await this.user.findByIdAndUpdate(
-                                decodedToken._id,
-                                {
-                                    ...userData,
-                                    username: request.body.username
-                                },
-                                { new: true }
-                            );
-                            if (user) {
-                                response.json(user);
-                            } else {
-                                next(
-                                    new HttpException(
-                                        500,
-                                        "Internal server error"
-                                    )
-                                );
-                            }
-                        } else {
-                            next(
-                                new NotFoundException("User has not been found")
-                            );
-                        }
-                    } else {
-                        next(new HttpException(401, "Invalid token"));
-                    }
-                } else {
-                    next(new HttpException(401, "Invalid token"));
-                }
+            const { username } = request.body;
+            if (this.checkUsernameDuplicate(username)) {
+                next(new HttpException(403, "Username already exists"));
             }
-        } catch (e) {
-            next(new HttpException(500, e.message));
+
+            const token = await this.getToken(request);
+            if (!token) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const userData = await this.user.findById(decodedToken._id);
+            if (!userData) {
+                next(new NotFoundException("User has not been found"));
+                return;
+            }
+
+            const user = await this.user.findByIdAndUpdate(
+                userData._id,
+                { ...userData, username: username },
+                { new: true }
+            );
+
+            if (user) {
+                response.json(user);
+            } else {
+                return;
+            }
+        } catch {
+            next(new InternalServerException());
         }
     };
 
@@ -318,40 +325,44 @@ export class UserController implements Controller {
         try {
             const { email } = request.body;
             if (this.checkEmailDuplicate(email)) {
-                next(new HttpException(403, "User already exists"));
+                next(new HttpException(403, "Email already exists"));
+                return;
             }
+
             const token = await this.getToken(request);
-            if (token) {
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                if (decodedToken) {
-                    const userData = await this.user.findById(decodedToken._id);
-                    if (userData) {
-                        const user = await this.user.findByIdAndUpdate(
-                            userData._id,
-                            { ...userData, email: email },
-                            { new: true }
-                        );
-                        if (user) {
-                            response.json(user);
-                        } else {
-                            next(
-                                new HttpException(500, "Internal server error")
-                            );
-                        }
-                    } else {
-                        next(new NotFoundException("User has not been found"));
-                    }
-                } else {
-                    next(new HttpException(401, "Invalid token"));
-                }
+            if (!token) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const userData = await this.user.findById(decodedToken._id);
+            if (!userData) {
+                next(new NotFoundException("User has not been found"));
+                return;
+            }
+
+            const user = await this.user.findByIdAndUpdate(
+                userData._id,
+                { ...userData, email: email },
+                { new: true }
+            );
+
+            if (user) {
+                response.json(user);
             } else {
-                next(new HttpException(401, "Invalid token"));
+                next(new InternalServerException());
             }
         } catch (e) {
-            next(new HttpException(500, e.message));
+            next(new InternalServerException());
         }
     };
 
