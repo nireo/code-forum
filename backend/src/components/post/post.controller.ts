@@ -10,6 +10,7 @@ import jwt from "jsonwebtoken";
 import DataStoredInToken from "../../interfaces/data.in.token.interface";
 import userModel from "../user/user.model";
 import InternalServerException from "../../exceptions/InternalServer";
+import TokenMissingException from "../../exceptions/TokenMissing";
 
 export class PostController implements Controller {
     public path: string = "/api/post";
@@ -151,26 +152,30 @@ export class PostController implements Controller {
     ): Promise<void> => {
         try {
             const token = this.getToken(request);
-            if (token) {
-                const id = request.params.id;
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                const user = await this.user.findById(decodedToken._id);
-                if (user) {
-                    if (this.checkForUserOwnership(user.posts, id)) {
-                        const success = await this.post.findByIdAndRemove(id);
-                        if (success) {
-                            response.send(204).end();
-                        } else {
-                            next(new NotFoundException("Post was not found"));
-                        }
+            if (!token) {
+                next(new TokenMissingException());
+                return;
+            }
+            const id = request.params.id;
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+            const user = await this.user.findById(decodedToken._id);
+            if (user) {
+                if (this.checkForUserOwnership(user.posts, id)) {
+                    const success = await this.post.findByIdAndRemove(id);
+                    if (success) {
+                        response.send(204).end();
+                    } else {
+                        next(new NotFoundException("Post was not found"));
                     }
-                    next(new HttpException(403, "Forbidden"));
                 }
-            } else {
-                next(new HttpException(401, "Invalid token"));
+                next(new HttpException(403, "Forbidden"));
             }
         } catch (e) {
             next(new HttpException(500, e.message));
@@ -185,40 +190,38 @@ export class PostController implements Controller {
         try {
             const token = this.getToken(request);
             const id: string = request.params.id;
-            if (token) {
-                const decodedToken = jwt.verify(
-                    token,
-                    "EnvSecret"
-                ) as DataStoredInToken;
-                const user = await this.user.findById(decodedToken._id);
-                if (user) {
-                    if (this.checkForUserOwnership(user.posts, id)) {
-                        const newData: UpdatePostDto = request.body;
-                        const newPost = this.post.findByIdAndUpdate(
-                            id,
-                            newData,
-                            {
-                                new: true
-                            }
-                        );
-                        if (newPost) {
-                            response.json(newPost);
-                        } else {
-                            // this is since most of the time 'findByIdAndUpdate' only returns
-                            // one type of error when the post has not been found.
-                            next(
-                                new NotFoundException("Post has not been found")
-                            );
-                        }
-                        next(new HttpException(403, "Forbidden"));
-                    } else {
-                        next(new HttpException(403, "Forbidden"));
-                    }
+            if (!token) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const decodedToken = jwt.verify(
+                token,
+                "EnvSecret"
+            ) as DataStoredInToken;
+            if (!decodedToken) {
+                next(new TokenMissingException());
+                return;
+            }
+
+            const user = await this.user.findById(decodedToken._id);
+            if (!user) {
+                next(new NotFoundException("User has not been found"));
+                return;
+            }
+
+            if (this.checkForUserOwnership(user.posts, id)) {
+                const newData: UpdatePostDto = request.body;
+                const newPost = this.post.findByIdAndUpdate(id, newData, {
+                    new: true
+                });
+                if (newPost) {
+                    response.json(newPost);
                 } else {
-                    next(new HttpException(403, "Forbidden"));
+                    // this is since most of the time 'findByIdAndUpdate' only returns
+                    // one type of error when the post has not been found.
+                    next(new NotFoundException("Post has not been found"));
                 }
-            } else {
-                next(new HttpException(401, "Invalid token"));
             }
         } catch (e) {
             next(new HttpException(500, e.message));
