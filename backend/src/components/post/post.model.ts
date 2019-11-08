@@ -34,12 +34,6 @@ const postScheme: mongoose.Schema = new mongoose.Schema({
     }
 });
 
-postScheme.set("toJSON", {
-    transform: (document, object) => {
-        delete object.__v;
-    }
-});
-
 postScheme.index(
     {
         title: "text",

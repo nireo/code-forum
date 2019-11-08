@@ -28,15 +28,6 @@ const userSchema: mongoose.Schema = new mongoose.Schema({
     ]
 });
 
-userSchema.set("toJSON", {
-    transform: (document, object) => {
-        delete object.__v;
-
-        // since it's bad to send the password even though it's hashed
-        delete object.password;
-    }
-});
-
 userSchema.index(
     {
         username: "text"

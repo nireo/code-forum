@@ -20,4 +20,5 @@ const report = mongoose.model<Report & mongoose.Document>(
     "Report",
     reportSchema
 );
+
 export default report;

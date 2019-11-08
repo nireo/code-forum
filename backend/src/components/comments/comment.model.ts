@@ -24,12 +24,6 @@ const commentSchema: mongoose.Schema = new mongoose.Schema({
     }
 });
 
-commentSchema.set("toJSON", {
-    transform: (document, object) => {
-        delete object.__v;
-    }
-});
-
 const comment = mongoose.model<Comment & mongoose.Document>(
     "Comment",
     commentSchema
